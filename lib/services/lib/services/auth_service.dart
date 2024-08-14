@@ -20,7 +20,7 @@ class AuthService {
       final UserCredential userCredential = await _auth.signInWithCredential(credential);
       return userCredential.user;
     } catch (e) {
-      print(e.toString());
+      print('Lỗi: $e');
       return null;
     }
   }
@@ -28,5 +28,18 @@ class AuthService {
   Future<void> signOut() async {
     await _auth.signOut();
     await _googleSignIn.signOut();
+  }
+  Future<String?> getAccessToken() async {
+    try {
+      final User? user = _auth.currentUser;
+      if (user != null) {
+        final idTokenResult = await user.getIdTokenResult();
+        return idTokenResult.token;
+      }
+      return null;
+    } catch (e) {
+      print('Error fetching access token: $e');
+      return null;
+    }
   }
 }

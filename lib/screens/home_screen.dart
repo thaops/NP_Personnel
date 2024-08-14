@@ -1,36 +1,69 @@
 import 'package:flutter/material.dart';
+import 'package:hocflutter/Api/api_service.dart';
 import 'package:hocflutter/screens/login_screen.dart';
 import 'package:hocflutter/services/lib/services/auth_service.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 class HomeScreen extends StatefulWidget {
-
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  String _accessToken = 'Loading...'; // Hiển thị thông báo tải dữ liệu
+  ApiService _apiService = ApiService();
 
-DateTime today = DateTime.now();
- Set<DateTime> selectedDays = {};
-String selectedValue = "Chọn trạng thái";
-void _onsSelected(DateTime day, DateTime focusedDay ){
-  setState(() {
-    today = day;
-  });
-}
-final AuthService _authService = AuthService();
-Future<void> _signOut() async {
-  await _authService.signOut();
-  Navigator.of(context).pushReplacement(
-    MaterialPageRoute(builder: (context) => LoginScreen()),
-  );
-}
+  @override
+  void initState() {
+    super.initState();
+    _fetchAccessToken();
+  }
+
+  Future<void> _fetchAccessToken() async {
+    try {
+      final authService = AuthService();
+      final accessToken = await authService.getAccessToken();
+      if (accessToken != null) {
+        final response = await _apiService.sendTokenToApi(accessToken);
+        print('API Response: ${response.message}');
+      }
+      setState(() {
+        _accessToken = accessToken ?? 'No token found';
+        print('Access Token User: $_accessToken');
+      });
+    } catch (e) {
+      setState(() {
+        _accessToken = 'Failed to fetch token';
+      });
+      print('Error fetching access token: $e');
+    }
+  }
+
+
+  DateTime today = DateTime.now();
+  Set<DateTime> selectedDays = {};
+  String selectedValue = "Chọn trạng thái";
+
+  void _onSelected(DateTime day, DateTime focusedDay) {
+    setState(() {
+      today = day;
+    });
+  }
+
+  final AuthService _authService = AuthService();
+
+  Future<void> _signOut() async {
+    await _authService.signOut();
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(builder: (context) => LoginScreen()),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
-      body: Padding(
+      body: SingleChildScrollView(  // Thêm SingleChildScrollView ở đây
         padding: const EdgeInsets.all(16.0),
         child: Center(
           child: Column(
@@ -45,11 +78,10 @@ Future<void> _signOut() async {
                     width: 44,
                   ),
                   Container(
-                    width: screenWidth * 0.65,
+                    width: screenWidth * 0.6,
                     alignment: Alignment.center,
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-
                       children: [
                         Container(child: Text("Configuration", style: TextStyle(fontSize: 14),)),
                         Container(child: Text("Statistic", style: TextStyle(fontSize: 14),)),
@@ -94,26 +126,27 @@ Future<void> _signOut() async {
                   ),
                 ),
               ),
-              SizedBox(height:40,),
+              SizedBox(height: 40,),
               TableCalendar(
-                headerStyle: HeaderStyle(formatButtonVisible: false,
-                    titleCentered: true,
-                    formatButtonShowsNext: false,
+                headerStyle: HeaderStyle(
+                  formatButtonVisible: false,
+                  titleCentered: true,
+                  formatButtonShowsNext: false,
                   titleTextStyle: TextStyle(fontSize: 0),
                   rightChevronVisible: false,
                   leftChevronVisible: false,
                 ),
-                  availableGestures: AvailableGestures.all,
-                  rowHeight: 80,
-                  selectedDayPredicate: (day) => isSameDay(day, today),
-                  focusedDay: today,
-                  firstDay: DateTime.utc(2010,08,08),
-                  lastDay: DateTime.utc(2025,12,12),
-                onDaySelected: _onsSelected,
+                availableGestures: AvailableGestures.all,
+                rowHeight: 80,
+                selectedDayPredicate: (day) => isSameDay(day, today),
+                focusedDay: today,
+                firstDay: DateTime.utc(2010, 08, 08),
+                lastDay: DateTime.utc(2025, 12, 12),
+                onDaySelected: _onSelected,
               ),
-              Container( height: 1, color: Colors.black,),
+              Container(height: 1, color: Colors.black,),
               SizedBox(height: 20,),
-              Text(today.toString().split(" ")[0],style: TextStyle(color: Colors.cyan),),
+              Text(today.toString().split(" ")[0], style: TextStyle(color: Colors.cyan),),
               SizedBox(height: 10,),
               Container(
                 height: 60,
@@ -166,7 +199,9 @@ Future<void> _signOut() async {
                     ],
                   ),
                 ),
-              )
+              ),
+              SizedBox(height: 20),
+
             ],
           ),
         ),

@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:hocflutter/Api/api_service.dart';
 import 'package:hocflutter/screens/home_screen.dart';
 import 'package:hocflutter/services/lib/services/auth_service.dart';
@@ -12,6 +13,7 @@ class LoginScreen extends StatelessWidget {
   final TextEditingController _passwordController = TextEditingController();
   final AuthService _authService = AuthService();
   final ApiService _apiService = ApiService();
+  final GoogleSignIn _googleSignIn = GoogleSignIn();
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
@@ -77,34 +79,44 @@ class LoginScreen extends StatelessWidget {
             SizedBox(height: 20),
             GoogleSignInButton(
               onPressed: () async {
-                User? user = await _authService.signInWithGoogle();
-                if (user != null) {
-                  String? idToken = await user.getIdToken(true);
-                  if (idToken != null) {
-                    var response = await _apiService.sendTokenToApi(idToken);
-                    if (response.statusCode == 200) {
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(builder: (context) => HomeScreen()),
-                      );
+                try {
+                  User? user = await _authService.signInWithGoogle();
+                  if (user != null) {
+                    // Lấy GoogleSignInAuthentication từ user
+                    final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+                    final GoogleSignInAuthentication googleAuth = await googleUser!.authentication;
+                    String? accessToken = googleAuth.accessToken;
+                    if (accessToken != null) {
+                      var response = await _apiService.sendTokenToApi(accessToken);
+                      print("Access Token: $accessToken");
+                      if (response.statusCode == 200) {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(builder: (context) => HomeScreen()),
+                        );
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Xác thực thất bại')),
+                        );
+                      }
                     } else {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Xác thực thất bại')),
+                        SnackBar(content: Text('Không thể lấy access token')),
                       );
                     }
                   } else {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Không thể lấy token')),
+                      SnackBar(content: Text('Đăng nhập thất bại')),
                     );
                   }
-                } else {
+                } catch (e) {
+                  print('Lỗi: $e');
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Đăng nhập thất bại')),
+                    SnackBar(content: Text('Có lỗi xảy ra')),
                   );
                 }
               },
-            ),
-
+            )
           ],
         ),
       ),
