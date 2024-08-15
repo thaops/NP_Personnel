@@ -59,7 +59,7 @@ class LoginScreen extends StatelessWidget {
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => HomeScreen()),
+                    MaterialPageRoute(builder: (context) => HomeScreen(accessToken: '')),
                   );
                 },
                 child: Text(
@@ -82,17 +82,16 @@ class LoginScreen extends StatelessWidget {
                 try {
                   User? user = await _authService.signInWithGoogle();
                   if (user != null) {
-                    // Lấy GoogleSignInAuthentication từ user
                     final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
                     final GoogleSignInAuthentication googleAuth = await googleUser!.authentication;
                     String? accessToken = googleAuth.accessToken;
                     if (accessToken != null) {
                       var response = await _apiService.sendTokenToApi(accessToken);
-                      print("Access Token: $accessToken");
+                      var accessTokenId = response.accessToken.toString();
                       if (response.statusCode == 200) {
                         Navigator.pushReplacement(
                           context,
-                          MaterialPageRoute(builder: (context) => HomeScreen()),
+                          MaterialPageRoute(builder: (context) => HomeScreen(accessToken: accessTokenId)),
                         );
                       } else {
                         ScaffoldMessenger.of(context).showSnackBar(

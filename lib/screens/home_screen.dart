@@ -1,54 +1,69 @@
 import 'package:flutter/material.dart';
 import 'package:hocflutter/Api/api_service.dart';
+import 'package:hocflutter/Api/models/task.dart';
 import 'package:hocflutter/screens/login_screen.dart';
+import 'package:hocflutter/screens/task_detail_screen.dart';
 import 'package:hocflutter/services/lib/services/auth_service.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 class HomeScreen extends StatefulWidget {
+  final String accessToken;
+  HomeScreen({required this.accessToken});
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
-
 class _HomeScreenState extends State<HomeScreen> {
-  String _accessToken = 'Loading...'; // Hiển thị thông báo tải dữ liệu
-  ApiService _apiService = ApiService();
+  final ApiService _apiService = ApiService();
+  DateTime today = DateTime.now();
+  DateTime? _startDate;
+  DateTime? _endDate;
 
+  @override
+  void TimeDay() {
+    print("DateTime_startDate"+_startDate.toString().split(" ")[0]);
+    print("DateTime_endDate"+_endDate.toString().split(" ")[0]);
+  }
+  Set<DateTime> selectedDays = {};
+  List<Task>? tasks;
   @override
   void initState() {
     super.initState();
-    _fetchAccessToken();
+    _fetchTasks();
   }
-
-  Future<void> _fetchAccessToken() async {
+  Future<void> _fetchTasks() async {
     try {
-      final authService = AuthService();
-      final accessToken = await authService.getAccessToken();
-      if (accessToken != null) {
-        final response = await _apiService.sendTokenToApi(accessToken);
-        print('API Response: ${response.message}');
+      if (widget.accessToken.isNotEmpty) {
+        tasks = await _apiService.fetchTasks(widget.accessToken);
+        tasks?.forEach((task) {
+          print('Task fetched: $task');
+        });
+        setState(() {});
       }
-      setState(() {
-        _accessToken = accessToken ?? 'No token found';
-        print('Access Token User: $_accessToken');
-      });
     } catch (e) {
+      print('Error fetching tasks: $e');
+    }
+  }
+  void _onDaySelected(DateTime selectedDay, DateTime focusedDay) {
+    if (_startDate == null) {
+      // Nếu chưa chọn ngày bắt đầu, thiết lập ngày bắt đầu
       setState(() {
-        _accessToken = 'Failed to fetch token';
+        _startDate = selectedDay;
+        _endDate = null; // Đặt ngày kết thúc về null khi chọn ngày bắt đầu mới
       });
-      print('Error fetching access token: $e');
+    } else if (_endDate == null && selectedDay.isAfter(_startDate!)) {
+      // Nếu đã chọn ngày bắt đầu và chọn ngày kết thúc hợp lệ
+      setState(() {
+        _endDate = selectedDay;
+      });
+    } else {
+      // Nếu đã chọn ngày bắt đầu và ngày kết thúc không hợp lệ
+      setState(() {
+        _startDate = selectedDay;
+        _endDate = null; // Đặt ngày kết thúc về null khi chọn ngày bắt đầu mới
+      });
     }
   }
 
-
-  DateTime today = DateTime.now();
-  Set<DateTime> selectedDays = {};
-  String selectedValue = "Chọn trạng thái";
-
-  void _onSelected(DateTime day, DateTime focusedDay) {
-    setState(() {
-      today = day;
-    });
-  }
 
   final AuthService _authService = AuthService();
 
@@ -61,9 +76,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    TimeDay();
     final screenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
-      body: SingleChildScrollView(  // Thêm SingleChildScrollView ở đây
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Center(
           child: Column(
@@ -97,7 +113,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               SizedBox(height: 14,),
               Container(
-                height: 40,
+                height: 50,
                 width: screenWidth,
                 decoration: BoxDecoration(
                   border: Border.all(
@@ -107,7 +123,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  padding: const EdgeInsets.fromLTRB(30, 0, 10, 0),
                   child: TextField(
                     textAlignVertical: TextAlignVertical.center,
                     decoration: InputDecoration(
@@ -126,7 +142,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
               ),
-              SizedBox(height: 40,),
+              SizedBox(height: 30,),
               TableCalendar(
                 headerStyle: HeaderStyle(
                   formatButtonVisible: false,
@@ -138,57 +154,90 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 availableGestures: AvailableGestures.all,
                 rowHeight: 80,
-                selectedDayPredicate: (day) => isSameDay(day, today),
+                selectedDayPredicate: (day) {
+                  return isSameDay(day, _startDate) || isSameDay(day, _endDate);
+                },
                 focusedDay: today,
                 firstDay: DateTime.utc(2010, 08, 08),
                 lastDay: DateTime.utc(2025, 12, 12),
-                onDaySelected: _onSelected,
+                onDaySelected: _onDaySelected,
+                calendarStyle: CalendarStyle(
+                  selectedDecoration: BoxDecoration(
+                    color: Colors.blue,
+                    shape: BoxShape.circle,
+                  ),
+                  todayDecoration: BoxDecoration(
+                    color: Colors.grey.shade300,
+                    shape: BoxShape.circle,
+                  ),
+                  outsideDecoration: BoxDecoration(
+                    color: Colors.transparent,
+                  ),
+                  outsideTextStyle: TextStyle(color: Colors.grey),
+                  defaultDecoration: BoxDecoration(
+                    color: Colors.transparent,
+                    shape: BoxShape.circle,
+                  ),
+                  rangeStartDecoration: BoxDecoration(
+                    color: Colors.green,
+                    shape: BoxShape.circle,
+                  ),
+                  rangeEndDecoration: BoxDecoration(
+                    color: Colors.red,
+                    shape: BoxShape.circle,
+                  ),
+                  rangeHighlightColor: Colors.blueGrey,
+                ),
+                rangeStartDay: _startDate,
+                rangeEndDay: _endDate,
               ),
               Container(height: 1, color: Colors.black,),
               SizedBox(height: 20,),
-              Text(today.toString().split(" ")[0], style: TextStyle(color: Colors.cyan),),
-              SizedBox(height: 10,),
-              Container(
-                height: 60,
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    width: 1,
-                    color: Colors.grey,
-                  ),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: Row(
-                    children: [
-                      PopupMenuButton<String>(
-                        onSelected: (String value) {
-                          setState(() {
-                            selectedValue = value;
-                          });
-                        },
-                        itemBuilder: (BuildContext context) {
-                          return {'Hoàn thành', 'Đang làm', 'Đã hoàn thành'}
-                              .map((String choice) {
-                            return PopupMenuItem<String>(
-                              value: choice,
-                              child: Text(choice),
-                            );
-                          }).toList();
-                        },
-                        child: Container(
-                          width: screenWidth * 0.8,
+              Text("Task Ngày: "+today.toString().split(" ")[0], style: TextStyle(color: Colors.black,fontWeight: FontWeight.w600, fontSize: 16),),
+              if (tasks != null && tasks!.isNotEmpty)
+                ListView.builder(
+                  shrinkWrap: true, // Để cho phép ListView nhỏ gọn trong SingleChildScrollView
+                  physics: NeverScrollableScrollPhysics(), // Ngăn ListView cuộn
+                  itemCount: tasks!.length,
+                  itemBuilder: (context, index) {
+                    final task = tasks![index];
+                    return GestureDetector(
+                      onTap: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => TaskDetailScreen(task: task),
+                          ),
+                        );
+                      },
+                      child: Container(
+                        height: 80,
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            width: 1,
+                            color: Colors.grey,
+                          ),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
                           child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text(
-                                "Tiêu đề",
-                                style: TextStyle(fontWeight: FontWeight.w700),
-                              ),
-                              Container(
+                              Expanded(
                                 child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Text(selectedValue),
-                                    Icon(Icons.arrow_drop_down, size: 24),
+                                    Text(
+                                      task.title,
+                                      style: TextStyle(fontWeight: FontWeight.w700),
+                                    ),
+                                    Row(
+                                      children: [
+                                        Text(
+                                          task.state,
+                                          style: TextStyle(color: Colors.green, fontWeight: FontWeight.w600),
+                                        ),
+                                        Icon(Icons.arrow_drop_down, size: 24),
+                                      ],
+                                    ),
                                   ],
                                 ),
                               ),
@@ -196,12 +245,11 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         ),
                       ),
-                    ],
-                  ),
-                ),
-              ),
-              SizedBox(height: 20),
-
+                    );
+                  },
+                )
+              else
+                Text('No tasks available', style: TextStyle(fontSize: 20,fontWeight: FontWeight.bold,color: Colors.amber),),
             ],
           ),
         ),
