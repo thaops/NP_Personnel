@@ -5,6 +5,7 @@ class Task {
   final String state;
   final String priority;
   final String creator;
+  final String note;
   final DateTime startDate;
   final DateTime dueDate;
 
@@ -15,6 +16,7 @@ class Task {
     required this.state,
     required this.priority,
     required this.creator,
+    required this.note,
     required this.startDate,
     required this.dueDate,
   });
@@ -27,6 +29,7 @@ class Task {
       state: json['state'] ?? '',
       priority: json['priority'] ?? '',
       creator: json['creator'] ?? '',
+      note: json['note'] ?? '',
       startDate: json['startDate'] != null ? DateTime.parse(json['startDate']) : DateTime.now(),
       dueDate: json['dueDate'] != null ? DateTime.parse(json['dueDate']) : DateTime.now(),
     );
@@ -34,6 +37,6 @@ class Task {
 
   @override
   String toString() {
-    return 'Task{id: $id, title: $title, description: $description, state: $state, priority: $priority, creator: $creator, startDate: $startDate, dueDate: $dueDate}';
+    return 'Task{id: $id, title: $title, description: $description, state: $state, priority: $priority, creator: $creator, note: $note, startDate: $startDate, dueDate: $dueDate}';
   }
 }

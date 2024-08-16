@@ -17,19 +17,95 @@ class TaskDetailScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Title: ${task.title}', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+            Text('Task: ${task.title}', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
             SizedBox(height: 10),
-            Text('Description: ${task.description}'),
-            SizedBox(height: 10),
-            Text('State: ${task.state}'),
-            SizedBox(height: 10),
-            Text('Priority: ${task.priority}'),
-            SizedBox(height: 10),
-            Text('Creator: ${task.creator}'),
-            SizedBox(height: 10),
-            Text('Start Date: ${task.startDate}'),
-            SizedBox(height: 10),
-            Text('Due Date: ${task.dueDate}'),
+            Row(children: [
+              Text("Creator: ",style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),),
+              SizedBox(height: 30),
+              Text('${task.creator}',style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),),
+            ],),
+            SizedBox(height: 40),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  flex: 1,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Tình trạng",
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                      ),
+                      Text(
+                        '${task.state}',
+                        style: TextStyle(color: Colors.green,fontSize: 15,fontWeight: FontWeight.w500),
+                      ),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  flex: 1,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Độ ưu tiên",
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                      ),
+                      Text(
+                        '${task.priority}',
+                        style: TextStyle(color: Colors.amberAccent,fontSize: 15, fontWeight: FontWeight.w500),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  flex: 1,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Ngày bắt đầu",
+                        style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+                      ),
+                      Text(
+                        '${task.startDate}',
+                        style: TextStyle(color: Colors.green, fontWeight: FontWeight.w500),
+                      ),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  flex: 1,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Ngày đáo hạn",
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                      ),
+                      Text(
+                        '${task.dueDate}',
+                        style: TextStyle(color: Colors.red, fontSize: 14,fontWeight: FontWeight.w500),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 20),
+            Row(children: [
+              Text("Note: ",style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),),
+              SizedBox(width: 10),
+              Text('${task.note} ',style: TextStyle(fontSize: 14, fontWeight: FontWeight.w400),),
+            ],),
           ],
         ),
       ),

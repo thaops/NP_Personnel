@@ -25,44 +25,52 @@ class _HomeScreenState extends State<HomeScreen> {
   }
   Set<DateTime> selectedDays = {};
   List<Task>? tasks;
-  @override
-  void initState() {
-    super.initState();
-    _fetchTasks();
+  void _checkAndFetchTasks() {
+    if (_startDate != null && _endDate != null) {
+      _fetchTasks();
+    } else {
+      setState(() {
+        tasks = null;
+      });
+    }
   }
+
+
+
   Future<void> _fetchTasks() async {
+    print('Fetching tasks...');
     try {
-      if (widget.accessToken.isNotEmpty) {
-        tasks = await _apiService.fetchTasks(widget.accessToken);
-        tasks?.forEach((task) {
-          print('Task fetched: $task');
-        });
+      if (widget.accessToken.isNotEmpty && _startDate != null && _endDate != null) {
+        tasks = await _apiService.fetchTasks(widget.accessToken, _startDate!, _endDate!);
         setState(() {});
+      } else {
+        print('Access token, start date, or end date is missing.');
       }
     } catch (e) {
       print('Error fetching tasks: $e');
     }
   }
+
+
   void _onDaySelected(DateTime selectedDay, DateTime focusedDay) {
     if (_startDate == null) {
-      // Nếu chưa chọn ngày bắt đầu, thiết lập ngày bắt đầu
       setState(() {
         _startDate = selectedDay;
-        _endDate = null; // Đặt ngày kết thúc về null khi chọn ngày bắt đầu mới
+        _endDate = null;
       });
     } else if (_endDate == null && selectedDay.isAfter(_startDate!)) {
-      // Nếu đã chọn ngày bắt đầu và chọn ngày kết thúc hợp lệ
       setState(() {
         _endDate = selectedDay;
       });
     } else {
-      // Nếu đã chọn ngày bắt đầu và ngày kết thúc không hợp lệ
       setState(() {
         _startDate = selectedDay;
-        _endDate = null; // Đặt ngày kết thúc về null khi chọn ngày bắt đầu mới
+        _endDate = null;
       });
     }
+    _checkAndFetchTasks();
   }
+
 
 
   final AuthService _authService = AuthService();
@@ -196,8 +204,8 @@ class _HomeScreenState extends State<HomeScreen> {
               Text("Task Ngày: "+today.toString().split(" ")[0], style: TextStyle(color: Colors.black,fontWeight: FontWeight.w600, fontSize: 16),),
               if (tasks != null && tasks!.isNotEmpty)
                 ListView.builder(
-                  shrinkWrap: true, // Để cho phép ListView nhỏ gọn trong SingleChildScrollView
-                  physics: NeverScrollableScrollPhysics(), // Ngăn ListView cuộn
+                  shrinkWrap: true,
+                  physics: NeverScrollableScrollPhysics(),
                   itemCount: tasks!.length,
                   itemBuilder: (context, index) {
                     final task = tasks![index];
@@ -249,7 +257,19 @@ class _HomeScreenState extends State<HomeScreen> {
                   },
                 )
               else
-                Text('No tasks available', style: TextStyle(fontSize: 20,fontWeight: FontWeight.bold,color: Colors.amber),),
+                Padding(
+                  padding: const EdgeInsets.only(top: 30),
+                  child: Column(
+                    children: [
+                      Text('No tasks available', style: TextStyle(fontSize: 16,fontWeight: FontWeight.bold,color: Colors.teal),),
+                      Image.asset(
+                        'assets/notdata.png',
+                        height: 150,
+                        width: 150,
+                      ),
+                    ],
+                  ),
+                ),
             ],
           ),
         ),

@@ -25,8 +25,12 @@ class ApiService {
     }
   }
 
-  Future<List<Task>> fetchTasks(String accessToken) async {
-    final url = Uri.parse('$_baseUrl/tasks?StartDate=2024-08-08&EndDate=2024-08-09&ForMe=false');
+  Future<List<Task>> fetchTasks(String accessToken, DateTime startDate, DateTime endDate) async {
+    final url = Uri.parse(
+      '$_baseUrl/tasks?StartDate=${startDate.toString().split(" ")[0]}&EndDate=${endDate.toString().split(" ")[0]}&ForMe=false',
+    );
+    print('Request URL: $url');
+
     final response = await http.get(
       url,
       headers: {
@@ -40,7 +44,7 @@ class ApiService {
       final responseData = json.decode(response.body);
       final taskDataList = responseData['data'] as List<dynamic>;
       final tasks = taskDataList
-          .expand((item) => (item['tasks'] as List<dynamic>))  // Mở rộng danh sách nhiệm vụ từ mỗi phần tử của data
+          .expand((item) => (item['tasks'] as List<dynamic>))
           .map((json) => Task.fromJson(json))
           .toList();
 
