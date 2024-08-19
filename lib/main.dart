@@ -19,8 +19,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: ThemeData(
-        useMaterial3: true, // Kích hoạt Material 3
-        colorSchemeSeed: Colors.blue, // Thay đổi màu chủ đạo
+        useMaterial3: true,
+        colorSchemeSeed: Colors.blue, 
       ),
       home: LoginScreen(),
       debugShowCheckedModeBanner: false,

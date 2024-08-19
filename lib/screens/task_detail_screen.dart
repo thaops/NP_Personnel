@@ -9,74 +9,64 @@ class TaskDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Task Details', style: Theme.of(context).textTheme.titleLarge),
-        backgroundColor: Colors.teal,
-        elevation: 0,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(bottom: Radius.circular(16)),
-        ),
+    return _buildBottomSheetContent(context);
+  }
+
+  Widget _buildBottomSheetContent(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+
+    return Container(
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
-      body: SingleChildScrollView(
+      child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Card(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              elevation: 4,
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Text(
-                  'Task: ${task.title}',
-                  style: Theme.of(context).textTheme.headline6?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+            Center(
+              child: Container(
+                width: 50,
+                height: 5,
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+                  borderRadius: BorderRadius.circular(2.5),
                 ),
               ),
             ),
-            SizedBox(height: 16),
-            _buildInfoRow("Creator", '${task.creator}', context),
-            SizedBox(height: 16),
-            _buildStatusPriorityRow("Status", '${task.state}', "Priority", '${task.priority}', context),
-            SizedBox(height: 16),
+            const SizedBox(height: 24),
+            Text(
+              'Task: ${task.title}',
+              style: textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 24),
+            _buildInfoRow("Creator", task.creator, context),
+            const SizedBox(height: 16),
+            _buildStatusPriorityRow("Status", task.state, "Priority", task.priority, context),
+            const SizedBox(height: 16),
             _buildDateRow("Start Date", task.startDate, "Due Date", task.dueDate, context),
-            SizedBox(height: 16),
-            _buildNoteSection('Note: ', '${task.note}', context),
+            const SizedBox(height: 16),
+            _buildNoteSection('Note:', task.note, context),
           ],
         ),
       ),
     );
   }
 
-  String _formatDate(DateTime dateTime) {
-    return DateFormat('dd MMM yyyy').format(dateTime);
-  }
-
-  String _formatTime(DateTime dateTime) {
-    return DateFormat('HH:mm').format(dateTime);
-  }
-
   Widget _buildInfoRow(String label1, String value1, BuildContext context) {
     return Row(
       children: [
-        Expanded(
-          child: Text(
-            '$label1: ',
-            style: Theme.of(context).textTheme.subtitle1?.copyWith(
-              fontWeight: FontWeight.w600,
-            ),
-          ),
+        Text(
+          '$label1: ',
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
         ),
+        const SizedBox(width: 10),
         Expanded(
           child: Text(
             value1,
-            style: Theme.of(context).textTheme.bodyText1?.copyWith(
-              fontWeight: FontWeight.w500,
-            ),
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
           ),
         ),
       ],
@@ -100,15 +90,13 @@ class TaskDetailScreen extends StatelessWidget {
         children: [
           Text(
             label,
-            style: Theme.of(context).textTheme.subtitle1?.copyWith(
-              fontWeight: FontWeight.w600,
-            ),
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
           ),
           Text(
             value,
-            style: Theme.of(context).textTheme.bodyText1?.copyWith(
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
               fontWeight: FontWeight.w500,
-              color: label == "Status" ? Colors.green : Colors.amberAccent,
+              color: label == "Status" ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.secondary,
             ),
           ),
         ],
@@ -133,22 +121,20 @@ class TaskDetailScreen extends StatelessWidget {
         children: [
           Text(
             label,
-            style: Theme.of(context).textTheme.subtitle1?.copyWith(
-              fontWeight: FontWeight.w600,
-            ),
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
           ),
           Text(
             _formatDate(dateTime),
-            style: Theme.of(context).textTheme.bodyText1?.copyWith(
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
               fontWeight: FontWeight.w500,
-              color: Colors.blue.shade600,
+              color: Theme.of(context).colorScheme.onSurface,
             ),
           ),
           Text(
             _formatTime(dateTime),
-            style: Theme.of(context).textTheme.bodyText1?.copyWith(
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
               fontWeight: FontWeight.w400,
-              color: Colors.grey.shade600,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),
           ),
         ],
@@ -162,20 +148,24 @@ class TaskDetailScreen extends StatelessWidget {
       children: [
         Text(
           label,
-          style: Theme.of(context).textTheme.subtitle1?.copyWith(
-            fontWeight: FontWeight.w600,
-          ),
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
         ),
-        SizedBox(width: 8),
+        const SizedBox(width: 8),
         Expanded(
           child: Text(
             note,
-            style: Theme.of(context).textTheme.bodyText1?.copyWith(
-              fontWeight: FontWeight.w400,
-            ),
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w400),
           ),
         ),
       ],
     );
+  }
+
+  String _formatDate(DateTime dateTime) {
+    return DateFormat('dd MMM yyyy').format(dateTime);
+  }
+
+  String _formatTime(DateTime dateTime) {
+    return DateFormat('HH:mm').format(dateTime);
   }
 }

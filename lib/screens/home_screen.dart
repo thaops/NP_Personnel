@@ -21,12 +21,6 @@ class _HomeScreenState extends State<HomeScreen> {
   DateTime? _endDate;
   DateTime _focusedDay = DateTime.now();
 
-  @override
-  void TimeDay() {
-    print("DateTime_startDate" + _startDate.toString().split(" ")[0]);
-    print("DateTime_endDate" + _endDate.toString().split(" ")[0]);
-  }
-
   Set<DateTime> selectedDays = {};
   List<Task>? tasks;
 
@@ -85,7 +79,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    TimeDay();
     final screenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
       appBar: AppBar(
@@ -221,10 +214,12 @@ class _HomeScreenState extends State<HomeScreen> {
                     final task = tasks![index];
                     return GestureDetector(
                       onTap: () {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (context) => TaskDetailScreen(task: task),
+                        showModalBottomSheet(
+                          context: context,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
                           ),
+                          builder: (context) => TaskDetailScreen(task: task),
                         );
                       },
                       child: Card(
