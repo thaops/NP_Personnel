@@ -4,6 +4,7 @@ import 'package:hocflutter/Api/models/task.dart';
 import 'package:hocflutter/screens/login_screen.dart';
 import 'package:hocflutter/screens/task_detail_screen.dart';
 import 'package:hocflutter/services/lib/services/auth_service.dart';
+import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -12,19 +13,24 @@ class HomeScreen extends StatefulWidget {
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
+
 class _HomeScreenState extends State<HomeScreen> {
   final ApiService _apiService = ApiService();
   DateTime today = DateTime.now();
   DateTime? _startDate;
   DateTime? _endDate;
+  DateTime _focusedDay = DateTime.now();
 
   @override
   void TimeDay() {
-    print("DateTime_startDate"+_startDate.toString().split(" ")[0]);
-    print("DateTime_endDate"+_endDate.toString().split(" ")[0]);
+    print("DateTime_startDate" + _startDate.toString().split(" ")[0]);
+    print("DateTime_endDate" + _endDate.toString().split(" ")[0]);
   }
+
   Set<DateTime> selectedDays = {};
   List<Task>? tasks;
+
+  final DateFormat dateFormat = DateFormat('yyyy-MM-dd');
   void _checkAndFetchTasks() {
     if (_startDate != null && _endDate != null) {
       _fetchTasks();
@@ -34,8 +40,6 @@ class _HomeScreenState extends State<HomeScreen> {
       });
     }
   }
-
-
 
   Future<void> _fetchTasks() async {
     print('Fetching tasks...');
@@ -50,7 +54,6 @@ class _HomeScreenState extends State<HomeScreen> {
       print('Error fetching tasks: $e');
     }
   }
-
 
   void _onDaySelected(DateTime selectedDay, DateTime focusedDay) {
     if (_startDate == null) {
@@ -71,8 +74,6 @@ class _HomeScreenState extends State<HomeScreen> {
     _checkAndFetchTasks();
   }
 
-
-
   final AuthService _authService = AuthService();
 
   Future<void> _signOut() async {
@@ -87,121 +88,130 @@ class _HomeScreenState extends State<HomeScreen> {
     TimeDay();
     final screenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
+      appBar: AppBar(
+        title: Text('Home'),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.logout),
+            onPressed: _signOut,
+          ),
+        ],
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Center(
           child: Column(
             children: [
-              SizedBox(height: 14,),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Image.asset(
-                    'assets/logo.png',
-                    height: 44,
-                    width: 44,
-                  ),
-                  Container(
-                    width: screenWidth * 0.6,
-                    alignment: Alignment.center,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Container(child: Text("Configuration", style: TextStyle(fontSize: 14),)),
-                        Container(child: Text("Statistic", style: TextStyle(fontSize: 14),)),
-                        Container(child: Text("Kanban", style: TextStyle(fontSize: 14),)),
-                      ],
-                    ),
-                  ),
-                  IconButton(
-                    icon: Icon(Icons.logout, size: 20),
-                    onPressed: _signOut,
-                  ),
-                ],
-              ),
-              SizedBox(height: 14,),
               Container(
                 height: 50,
                 width: screenWidth,
                 decoration: BoxDecoration(
-                  border: Border.all(
-                    width: 1,
-                    color: Colors.grey,
-                  ),
-                  borderRadius: BorderRadius.circular(8),
+                  color: Colors.white,
+                  border: Border.all(color: Colors.grey.shade300),
+                  borderRadius: BorderRadius.circular(12),
                 ),
                 child: Padding(
-                  padding: const EdgeInsets.fromLTRB(30, 0, 10, 0),
+                  padding: const EdgeInsets.fromLTRB(16, 0, 8, 0),
                   child: TextField(
                     textAlignVertical: TextAlignVertical.center,
                     decoration: InputDecoration(
-                      hintText: 'search..........',
-                      hintStyle: TextStyle(
-                        color: Colors.grey,
-                      ),
+                      hintText: 'Search...',
+                      hintStyle: TextStyle(color: Colors.grey.shade500),
                       border: InputBorder.none,
-                      contentPadding: EdgeInsets.symmetric(vertical: 0),
                       suffixIcon: Icon(
                         Icons.search,
                         size: 24,
-                        color: Colors.grey,
+                        color: Colors.grey.shade500,
                       ),
                     ),
                   ),
                 ),
               ),
-              SizedBox(height: 30,),
+              SizedBox(height: 16),
               TableCalendar(
                 headerStyle: HeaderStyle(
                   formatButtonVisible: false,
                   titleCentered: true,
-                  formatButtonShowsNext: false,
-                  titleTextStyle: TextStyle(fontSize: 0),
-                  rightChevronVisible: false,
-                  leftChevronVisible: false,
+                  headerMargin: EdgeInsets.only(bottom: 16),
+                  titleTextStyle: TextStyle(
+                    fontSize: 20.0,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.1),
+                        offset: Offset(0, 4),
+                        blurRadius: 8,
+                      ),
+                    ],
+                  ),
                 ),
                 availableGestures: AvailableGestures.all,
-                rowHeight: 80,
+                rowHeight: 65,
                 selectedDayPredicate: (day) {
                   return isSameDay(day, _startDate) || isSameDay(day, _endDate);
                 },
-                focusedDay: today,
+                focusedDay: _focusedDay,
                 firstDay: DateTime.utc(2010, 08, 08),
                 lastDay: DateTime.utc(2025, 12, 12),
                 onDaySelected: _onDaySelected,
+                onPageChanged: (focusedDay) {
+                  setState(() {
+                    _focusedDay = focusedDay;
+                  });
+                },
                 calendarStyle: CalendarStyle(
-                  selectedDecoration: BoxDecoration(
-                    color: Colors.blue,
-                    shape: BoxShape.circle,
+                  cellMargin: EdgeInsets.all(6.0),
+                  outsideDaysVisible: false,
+                  defaultDecoration: BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.rectangle,
+                    borderRadius: BorderRadius.circular(8.0), // Bo góc mềm mại
+                    border: Border.all(color: Colors.grey.shade300, width: 1.0), // Đường viền mỏng
                   ),
-                  todayDecoration: BoxDecoration(
-                    color: Colors.grey.shade300,
-                    shape: BoxShape.circle,
+                  weekendDecoration: BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.rectangle,
+                    borderRadius: BorderRadius.circular(8.0),
+                    border: Border.all(color: Colors.grey.shade300, width: 1.0),
                   ),
                   outsideDecoration: BoxDecoration(
-                    color: Colors.transparent,
+                    color: Colors.white,
+                    shape: BoxShape.rectangle,
+                    borderRadius: BorderRadius.circular(8.0),
+                    border: Border.all(color: Colors.grey.shade300, width: 1.0),
                   ),
-                  outsideTextStyle: TextStyle(color: Colors.grey),
-                  defaultDecoration: BoxDecoration(
-                    color: Colors.transparent,
-                    shape: BoxShape.circle,
+                  todayDecoration: BoxDecoration(
+                    color: Colors.teal.shade50,
+                    shape: BoxShape.rectangle,
+                    borderRadius: BorderRadius.circular(8.0),
+                    border: Border.all(color: Colors.teal.shade200, width: 1.0),
                   ),
-                  rangeStartDecoration: BoxDecoration(
-                    color: Colors.green,
-                    shape: BoxShape.circle,
+                  selectedDecoration: BoxDecoration(
+                    color: Colors.teal,
+                    shape: BoxShape.rectangle,
+                    borderRadius: BorderRadius.circular(8.0),
+                    border: Border.all(color: Colors.teal.shade700, width: 1.0),
                   ),
-                  rangeEndDecoration: BoxDecoration(
-                    color: Colors.red,
-                    shape: BoxShape.circle,
-                  ),
-                  rangeHighlightColor: Colors.blueGrey,
+                  rangeHighlightColor: Colors.teal.shade100.withOpacity(0.5),
                 ),
-                rangeStartDay: _startDate,
-                rangeEndDay: _endDate,
               ),
-              Container(height: 1, color: Colors.black,),
-              SizedBox(height: 20,),
-              Text("Task Ngày: "+today.toString().split(" ")[0], style: TextStyle(color: Colors.black,fontWeight: FontWeight.w600, fontSize: 16),),
+
+              SizedBox(height: 20),
+              Divider(),
+              SizedBox(height: 20),
+              Text(
+                "Tasks on ${_startDate != null ? dateFormat.format(_startDate!) : 'Unknown Date'} - ${_endDate != null ? dateFormat.format(_endDate!) : 'Unknown Date'}",
+                style: TextStyle(
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
+              ),
               if (tasks != null && tasks!.isNotEmpty)
                 ListView.builder(
                   shrinkWrap: true,
@@ -217,38 +227,22 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         );
                       },
-                      child: Container(
-                        height: 80,
-                        decoration: BoxDecoration(
-                          border: Border.all(
-                            width: 1,
-                            color: Colors.grey,
+                      child: Card(
+                        margin: const EdgeInsets.symmetric(vertical: 8),
+                        child: ListTile(
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+                          title: Text(
+                            task.title,
+                            style: TextStyle(fontWeight: FontWeight.bold),
                           ),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          child: Row(
+                          trailing: Row(
+                            mainAxisSize: MainAxisSize.min,
                             children: [
-                              Expanded(
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(
-                                      task.title,
-                                      style: TextStyle(fontWeight: FontWeight.w700),
-                                    ),
-                                    Row(
-                                      children: [
-                                        Text(
-                                          task.state,
-                                          style: TextStyle(color: Colors.green, fontWeight: FontWeight.w600),
-                                        ),
-                                        Icon(Icons.arrow_drop_down, size: 24),
-                                      ],
-                                    ),
-                                  ],
-                                ),
+                              Text(
+                                task.state,
+                                style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold),
                               ),
+                              Icon(Icons.arrow_drop_down, size: 24),
                             ],
                           ),
                         ),
@@ -261,7 +255,11 @@ class _HomeScreenState extends State<HomeScreen> {
                   padding: const EdgeInsets.only(top: 30),
                   child: Column(
                     children: [
-                      Text('No tasks available', style: TextStyle(fontSize: 16,fontWeight: FontWeight.bold,color: Colors.teal),),
+                      Text(
+                        'No tasks available',
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.teal),
+                      ),
+                      SizedBox(height: 16),
                       Image.asset(
                         'assets/notdata.png',
                         height: 150,

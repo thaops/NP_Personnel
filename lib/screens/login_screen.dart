@@ -7,13 +7,13 @@ import 'package:hocflutter/services/lib/services/auth_service.dart';
 import 'package:hocflutter/widgets/custom_text_field.dart';
 import 'package:hocflutter/widgets/google_sign_in_button.dart';
 
-
 class LoginScreen extends StatelessWidget {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final AuthService _authService = AuthService();
   final ApiService _apiService = ApiService();
   final GoogleSignIn _googleSignIn = GoogleSignIn();
+
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
@@ -39,7 +39,7 @@ class LoginScreen extends StatelessWidget {
             SizedBox(height: 20),
             CustomTextField(
               controller: _passwordController,
-              hintText: 'Pass',
+              hintText: 'Password',
               label: 'Mật Khẩu',
               icon: Icons.lock,
               obscureText: true,
@@ -49,17 +49,19 @@ class LoginScreen extends StatelessWidget {
               width: screenWidth,
               height: 50,
               decoration: BoxDecoration(
-                color: Colors.indigo,
-                borderRadius: BorderRadius.circular(8),
+                color: Colors.indigo, // Update to Material 3 color
+                borderRadius: BorderRadius.circular(12), // Material 3 rounder corners
               ),
               child: ElevatedButton(
-                style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.all(Colors.indigo),
+                style: ElevatedButton.styleFrom(
+                  primary: Colors.indigo, // Material 3 color
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                 ),
                 onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => HomeScreen(accessToken: '')),
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Tính năng chưa hoàn thiện!')),
                   );
                 },
                 child: Text(
@@ -74,7 +76,7 @@ class LoginScreen extends StatelessWidget {
             SizedBox(height: 20),
             Text(
               "Hoặc",
-              style: TextStyle(color: Colors.grey),
+              style: TextStyle(color: Colors.grey.shade600), // Updated to fit Material 3 color palette
             ),
             SizedBox(height: 20),
             GoogleSignInButton(
