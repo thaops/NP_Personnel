@@ -49,12 +49,12 @@ class LoginScreen extends StatelessWidget {
               width: screenWidth,
               height: 50,
               decoration: BoxDecoration(
-                color: Colors.indigo, // Update to Material 3 color
-                borderRadius: BorderRadius.circular(12), // Material 3 rounder corners
+                color: Colors.indigo, 
+                borderRadius: BorderRadius.circular(12), 
               ),
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  primary: Colors.indigo, // Material 3 color
+                  primary: Colors.indigo, 
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),

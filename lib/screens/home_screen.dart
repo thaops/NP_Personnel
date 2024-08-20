@@ -21,7 +21,7 @@ class _HomeScreenState extends State<HomeScreen> {
   DateTime? _endDate;
   DateTime _focusedDay = DateTime.now();
 
-  Set<DateTime> selectedDays = {};
+  List<DateTime> selectedDays = [];
   List<Task>? tasks;
 
   final DateFormat dateFormat = DateFormat('yyyy-MM-dd');
@@ -38,8 +38,11 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> _fetchTasks() async {
     print('Fetching tasks...');
     try {
-      if (widget.accessToken.isNotEmpty && _startDate != null && _endDate != null) {
-        tasks = await _apiService.fetchTasks(widget.accessToken, _startDate!, _endDate!);
+      if (widget.accessToken.isNotEmpty &&
+          _startDate != null &&
+          _endDate != null) {
+        tasks = await _apiService.fetchTasks(
+            widget.accessToken, _startDate!, _endDate!);
         setState(() {});
       } else {
         print('Access token, start date, or end date is missing.');
@@ -50,21 +53,29 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _onDaySelected(DateTime selectedDay, DateTime focusedDay) {
-    if (_startDate == null) {
-      setState(() {
+    setState(() {
+      _focusedDay = focusedDay;
+
+      if (_startDate == null) {
         _startDate = selectedDay;
+        selectedDays.clear();
+        selectedDays.add(selectedDay);
+      } else if (selectedDays.contains(selectedDay)) {
+        selectedDays.remove(selectedDay);
+      } else {
+        selectedDays.add(selectedDay);
+      }
+      selectedDays.sort((a, b) => a.compareTo(b));
+
+      if (selectedDays.isNotEmpty) {
+        _startDate = selectedDays.first;
+        _endDate = selectedDays.last;
+      } else {
+        _startDate = null;
         _endDate = null;
-      });
-    } else if (_endDate == null && selectedDay.isAfter(_startDate!)) {
-      setState(() {
-        _endDate = selectedDay;
-      });
-    } else {
-      setState(() {
-        _startDate = selectedDay;
-        _endDate = null;
-      });
-    }
+      }
+    });
+
     _checkAndFetchTasks();
   }
 
@@ -133,7 +144,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
+                    borderRadius:
+                        BorderRadius.vertical(top: Radius.circular(12)),
                     boxShadow: [
                       BoxShadow(
                         color: Colors.black.withOpacity(0.1),
@@ -163,8 +175,10 @@ class _HomeScreenState extends State<HomeScreen> {
                   defaultDecoration: BoxDecoration(
                     color: Colors.white,
                     shape: BoxShape.rectangle,
-                    borderRadius: BorderRadius.circular(8.0), // Bo góc mềm mại
-                    border: Border.all(color: Colors.grey.shade300, width: 1.0), // Đường viền mỏng
+                    borderRadius: BorderRadius.circular(8.0),
+                    border: Border.all(
+                        color: Colors.grey.shade300,
+                        width: 1.0), // Đường viền mỏng
                   ),
                   weekendDecoration: BoxDecoration(
                     color: Colors.white,
@@ -193,7 +207,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   rangeHighlightColor: Colors.teal.shade100.withOpacity(0.5),
                 ),
               ),
-
               SizedBox(height: 20),
               Divider(),
               SizedBox(height: 20),
@@ -214,18 +227,18 @@ class _HomeScreenState extends State<HomeScreen> {
                     final task = tasks![index];
                     return GestureDetector(
                       onTap: () {
-                        showModalBottomSheet(
-                          context: context,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => TaskDetailScreen(task: task),
                           ),
-                          builder: (context) => TaskDetailScreen(task: task),
                         );
                       },
                       child: Card(
                         margin: const EdgeInsets.symmetric(vertical: 8),
                         child: ListTile(
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+                          contentPadding:
+                              const EdgeInsets.symmetric(horizontal: 16),
                           title: Text(
                             task.title,
                             style: TextStyle(fontWeight: FontWeight.bold),
@@ -235,7 +248,9 @@ class _HomeScreenState extends State<HomeScreen> {
                             children: [
                               Text(
                                 task.state,
-                                style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold),
+                                style: TextStyle(
+                                    color: Colors.green,
+                                    fontWeight: FontWeight.bold),
                               ),
                               Icon(Icons.arrow_drop_down, size: 24),
                             ],
@@ -252,7 +267,10 @@ class _HomeScreenState extends State<HomeScreen> {
                     children: [
                       Text(
                         'No tasks available',
-                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.teal),
+                        style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.teal),
                       ),
                       SizedBox(height: 16),
                       Image.asset(

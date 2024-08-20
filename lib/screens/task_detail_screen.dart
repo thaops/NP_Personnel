@@ -4,76 +4,139 @@ import 'package:intl/intl.dart';
 
 class TaskDetailScreen extends StatelessWidget {
   final Task task;
-
   TaskDetailScreen({required this.task});
 
   @override
   Widget build(BuildContext context) {
-    return _buildBottomSheetContent(context);
-  }
-
-  Widget _buildBottomSheetContent(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
-
-    return Container(
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+    final screenWidth = MediaQuery.of(context).size.width;
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          'Task Details',
+          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.bold,
+                color: Colors.white, // Màu chữ sáng để nổi bật trên nền xanh lá
+              ),
+        ),
+        elevation: 4,
+        backgroundColor: Colors.green,
+        toolbarHeight: 80,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(
+            bottom: Radius.circular(16.0),
+          ),
+        ),
+        actions: [
+          SizedBox(width: 16),
+          IconButton(
+            icon: Icon(Icons.more_vert,
+                color: Theme.of(context).colorScheme.onPrimary),
+            onPressed: () {
+            },
+          ),
+        ],
       ),
-      child: Padding(
+      body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
-          mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Center(
-              child: Container(
-                width: 50,
-                height: 5,
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
-                  borderRadius: BorderRadius.circular(2.5),
-                ),
-              ),
-            ),
             const SizedBox(height: 24),
-            Text(
-              'Task: ${task.title}',
-              style: textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
-            ),
+            _buildTitleSection(
+                'Tiêu đề công việc:', task.title, context, screenWidth),
             const SizedBox(height: 24),
-            _buildInfoRow("Creator", task.creator, context),
+            _buildInfoRow("Nhân Viên", task.creator, context),
             const SizedBox(height: 16),
-            _buildStatusPriorityRow("Status", task.state, "Priority", task.priority, context),
+            _buildStatusPriorityRow(
+                "Trạng Thái", task.state, "Độ ưu tiên", task.priority, context),
             const SizedBox(height: 16),
-            _buildDateRow("Start Date", task.startDate, "Due Date", task.dueDate, context),
+            _buildDateRow("Ngày bắt đầu", task.startDate, "Ngày đến hạn",
+                task.dueDate, context),
             const SizedBox(height: 16),
-            _buildNoteSection('Note:', task.note, context),
+            _buildNoteSection('Note:', task.note, context, screenWidth),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildInfoRow(String label1, String value1, BuildContext context) {
-    return Row(
+  Widget _buildTitleSection(
+      String label, String title, BuildContext context, double screenWidth) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          '$label1: ',
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
+          label,
+          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: Theme.of(context).colorScheme.onBackground),
         ),
-        const SizedBox(width: 10),
-        Expanded(
-          child: Text(
-            value1,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Container(
+            width: screenWidth,
+            height: 80,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(8.0),
+              border: Border.all(
+                width: 1.0,
+                color: Theme.of(context).colorScheme.outline,
+              ),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(
+                title,
+                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                    fontWeight: FontWeight.w400,
+                    color: Theme.of(context).colorScheme.onSurface),
+              ),
+            ),
           ),
         ),
       ],
     );
   }
 
-  Widget _buildStatusPriorityRow(String label1, String value1, String label2, String value2, BuildContext context) {
+  Widget _buildInfoRow(String label1, String value1, BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          '$label1:',
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.w600,
+              color: Theme.of(context).colorScheme.onBackground),
+        ),
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Container(
+            width: 200,
+            height: 40,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(8.0),
+              border: Border.all(
+                width: 1.0,
+                color: Theme.of(context).colorScheme.outline,
+              ),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(
+                value1,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: Theme.of(context).colorScheme.onSurface),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildStatusPriorityRow(String label1, String value1, String label2,
+      String value2, BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -90,13 +153,34 @@ class TaskDetailScreen extends StatelessWidget {
         children: [
           Text(
             label,
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w600,
+                color: Theme.of(context).colorScheme.onBackground),
           ),
-          Text(
-            value,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              fontWeight: FontWeight.w500,
-              color: label == "Status" ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.secondary,
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Container(
+              width: 150,
+              height: 40,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8.0),
+                border: Border.all(
+                  width: 1.0,
+                  color: Theme.of(context).colorScheme.outline,
+                ),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
+                  value,
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        fontWeight: FontWeight.w500,
+                        color: label == "Trạng Thái"
+                            ? Colors.green
+                            : Theme.of(context).colorScheme.secondary,
+                      ),
+                ),
+              ),
             ),
           ),
         ],
@@ -104,7 +188,8 @@ class TaskDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildDateRow(String label1, DateTime date1, String label2, DateTime date2, BuildContext context) {
+  Widget _buildDateRow(String label1, DateTime date1, String label2,
+      DateTime date2, BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -114,27 +199,53 @@ class TaskDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildDateDetailColumn(String label, DateTime dateTime, BuildContext context) {
+  Widget _buildDateDetailColumn(
+      String label, DateTime dateTime, BuildContext context) {
     return Expanded(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             label,
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w600,
+                color: Theme.of(context).colorScheme.onBackground),
           ),
-          Text(
-            _formatDate(dateTime),
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              fontWeight: FontWeight.w500,
-              color: Theme.of(context).colorScheme.onSurface,
-            ),
-          ),
-          Text(
-            _formatTime(dateTime),
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              fontWeight: FontWeight.w400,
-              color: Theme.of(context).colorScheme.onSurfaceVariant,
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Container(
+              width: 160,
+              height: 40,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8.0),
+                border: Border.all(
+                  width: 1.0,
+                  color: Theme.of(context).colorScheme.outline,
+                ),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      _formatDate(dateTime),
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            fontWeight: FontWeight.w500,
+                            color: Theme.of(context).colorScheme.onSurface,
+                          ),
+                    ),
+                    Text(
+                      _formatTime(dateTime),
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            fontWeight: FontWeight.w400,
+                            color:
+                                Theme.of(context).colorScheme.onSurfaceVariant,
+                          ),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ),
         ],
@@ -142,19 +253,38 @@ class TaskDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildNoteSection(String label, String note, BuildContext context) {
-    return Row(
+  Widget _buildNoteSection(
+      String label, String note, BuildContext context, double screenWidth) {
+    return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           label,
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.w600,
+              color: Theme.of(context).colorScheme.onBackground),
         ),
-        const SizedBox(width: 8),
-        Expanded(
-          child: Text(
-            note,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w400),
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Container(
+            width: screenWidth,
+            height: 80,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(8.0),
+              border: Border.all(
+                width: 1.0,
+                color: Theme.of(context).colorScheme.outline,
+              ),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(
+                note,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    fontWeight: FontWeight.w400,
+                    color: Theme.of(context).colorScheme.onSurface),
+              ),
+            ),
           ),
         ),
       ],
@@ -162,10 +292,12 @@ class TaskDetailScreen extends StatelessWidget {
   }
 
   String _formatDate(DateTime dateTime) {
-    return DateFormat('dd MMM yyyy').format(dateTime);
+    // Thay đổi định dạng ngày theo nhu cầu của bạn
+    return DateFormat('yyyy-MM-dd').format(dateTime);
   }
 
   String _formatTime(DateTime dateTime) {
-    return DateFormat('HH:mm').format(dateTime);
+    // Thay đổi định dạng giờ theo nhu cầu của bạn
+    return DateFormat('h:mm a').format(dateTime);
   }
 }

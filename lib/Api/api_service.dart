@@ -25,37 +25,32 @@ class ApiService {
     }
   }
 
-  Future<List<Task>> fetchTasks(String accessToken, DateTime startDate, DateTime endDate) async {
-    final url = Uri.parse(
-      '$_baseUrl/tasks?StartDate=${startDate.toString().split(" ")[0]}&EndDate=${endDate.toString().split(" ")[0]}&ForMe=false',
-    );
-    print('Request URL: $url');
+Future<List<Task>> fetchTasks(String accessToken, DateTime startDate, DateTime endDate) async {
+  final url = Uri.parse(
+    '$_baseUrl/tasks?StartDate=${startDate.toIso8601String()}&EndDate=${endDate.toIso8601String()}&ForMe=false',
+  );
 
-    final response = await http.get(
-      url,
-      headers: {
-        'Authorization': 'Bearer $accessToken',
-      },
-    );
+  final response = await http.get(
+    url,
+    headers: {
+      'Authorization': 'Bearer $accessToken',
+    },
+  );
 
+  if (response.statusCode == 200) {
+    final responseData = json.decode(response.body);
+    final taskDataList = responseData['data'] as List<dynamic>;
+    final tasks = taskDataList
+        .expand((item) => (item['tasks'] as List<dynamic>))
+        .map((json) => Task.fromJson(json))
+        .toList();
+
+    return tasks;
+  } else {
+    print('Failed to load tasks: ${response.statusCode}');
     print('Response body: ${response.body}');
-
-    if (response.statusCode == 200) {
-      final responseData = json.decode(response.body);
-      final taskDataList = responseData['data'] as List<dynamic>;
-      final tasks = taskDataList
-          .expand((item) => (item['tasks'] as List<dynamic>))
-          .map((json) => Task.fromJson(json))
-          .toList();
-
-      return tasks;
-    } else {
-      print('Failed to load tasks: ${response.statusCode}');
-      print('Response body: ${response.body}');
-      throw Exception('Failed to load tasks');
-    }
+    throw Exception('Failed to load tasks');
   }
-
-
 }
 
+}
