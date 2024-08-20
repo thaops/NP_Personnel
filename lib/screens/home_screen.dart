@@ -63,6 +63,9 @@ class _HomeScreenState extends State<HomeScreen> {
       } else if (selectedDays.contains(selectedDay)) {
         selectedDays.remove(selectedDay);
       } else {
+        if (selectedDays.length >= 2) {
+          selectedDays.clear();
+        }
         selectedDays.add(selectedDay);
       }
       selectedDays.sort((a, b) => a.compareTo(b));

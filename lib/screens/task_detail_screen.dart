@@ -15,11 +15,11 @@ class TaskDetailScreen extends StatelessWidget {
           'Task Details',
           style: Theme.of(context).textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.bold,
-                color: Colors.white, // Màu chữ sáng để nổi bật trên nền xanh lá
+                color: Colors.white, 
               ),
         ),
         elevation: 4,
-        backgroundColor: Colors.green,
+        backgroundColor: Colors.teal,
         toolbarHeight: 80,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(
