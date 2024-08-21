@@ -54,7 +54,7 @@ class LoginScreen extends StatelessWidget {
               ),
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  primary: Colors.indigo, 
+                 backgroundColor: Colors.indigo,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -76,7 +76,7 @@ class LoginScreen extends StatelessWidget {
             SizedBox(height: 20),
             Text(
               "Hoặc",
-              style: TextStyle(color: Colors.grey.shade600), // Updated to fit Material 3 color palette
+              style: TextStyle(color: Colors.grey.shade600), 
             ),
             SizedBox(height: 20),
             GoogleSignInButton(
