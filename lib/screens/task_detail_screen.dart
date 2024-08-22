@@ -1,10 +1,104 @@
 import 'package:flutter/material.dart';
+import 'package:hocflutter/Api/api_service.dart';
 import 'package:hocflutter/Api/models/task.dart';
-import 'package:intl/intl.dart';
+import 'package:hocflutter/widgets/task_title_section.dart';
+import 'package:hocflutter/widgets/task_info_row.dart';
+import 'package:hocflutter/widgets/task_status_priority_row.dart';
+import 'package:hocflutter/widgets/task_date_row.dart';
+import 'package:hocflutter/widgets/task_note_section.dart';
+import 'package:provider/provider.dart';
 
-class TaskDetailScreen extends StatelessWidget {
+class TaskDetailScreen extends StatefulWidget {
   final Task task;
   TaskDetailScreen({required this.task});
+
+  @override
+  _TaskDetailScreenState createState() => _TaskDetailScreenState();
+}
+
+class _TaskDetailScreenState extends State<TaskDetailScreen> {
+  ApiService apiService = ApiService();
+  late TextEditingController _controller;
+  late TextEditingController _controllerNote;
+  late DateTime _startDate;
+  late DateTime _dueDate;
+  late String _status;
+  late String _priority;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController(text: widget.task.title);
+    _controllerNote = TextEditingController(text: widget.task.note);
+    _startDate = widget.task.startDate;
+    _dueDate = widget.task.dueDate;
+    _status = widget.task.state;
+    _priority = widget.task.priority;
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    _controllerNote.dispose();
+    super.dispose();
+  }
+
+  void _updateDate(DateTime newDate, bool isStartDate) {
+    setState(() {
+      if (isStartDate) {
+        _startDate = newDate;
+      } else {
+        _dueDate = newDate;
+      }
+    });
+  }
+
+  void _updateStatus(String newStatus) {
+    setState(() {
+      _status = newStatus;
+    });
+  }
+
+  void _updatePriority(String newPriority) {
+    setState(() {
+      _priority = newPriority;
+    });
+  }
+
+  void _saveTask() async {
+    final apiService = Provider.of<ApiService>(context, listen: false);
+    final accessToken = apiService.accessTokenId;
+    final taskId = widget.task.id;
+
+    Map<String, dynamic> updateData = {
+      'title': _controller.text,
+      'note': _controllerNote.text,
+      'startDate': _startDate.toIso8601String(),
+      'dueDate': _dueDate.toIso8601String(),
+      'state': _status,
+      'priority': _priority,
+    };
+
+    print("Update Data: $updateData");
+    print("taskId: $taskId");
+
+    final response =
+        await apiService.updateTask(taskId, accessToken, updateData);
+
+    print("Response Status: ${response.statusCode}");
+    print("Response Body: ${response.message}");
+
+    if (response.statusCode == 200) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Cập nhật Task Thành công')),
+      );
+      Navigator.pop(context);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Cập nhật Task Thất bại: ${response.message}')),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -15,7 +109,7 @@ class TaskDetailScreen extends StatelessWidget {
           'Task Details',
           style: Theme.of(context).textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.bold,
-                color: Colors.white, 
+                color: Colors.white,
               ),
         ),
         elevation: 4,
@@ -31,273 +125,76 @@ class TaskDetailScreen extends StatelessWidget {
           IconButton(
             icon: Icon(Icons.more_vert,
                 color: Theme.of(context).colorScheme.onPrimary),
-            onPressed: () {
-            },
+            onPressed: () {},
           ),
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 24),
-            _buildTitleSection(
-                'Tiêu đề công việc:', task.title, context, screenWidth),
-            const SizedBox(height: 24),
-            _buildInfoRow("Nhân Viên", task.creator, context),
-            const SizedBox(height: 16),
-            _buildStatusPriorityRow(
-                "Trạng Thái", task.state, "Độ ưu tiên", task.priority, context),
-            const SizedBox(height: 16),
-            _buildDateRow("Ngày bắt đầu", task.startDate, "Ngày đến hạn",
-                task.dueDate, context),
-            const SizedBox(height: 16),
-            _buildNoteSection('Note:', task.note, context, screenWidth),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildTitleSection(
-      String label, String title, BuildContext context, double screenWidth) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-              fontWeight: FontWeight.bold,
-              color: Theme.of(context).colorScheme.onBackground),
-        ),
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Container(
-            width: screenWidth,
-            height: 80,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(8.0),
-              border: Border.all(
-                width: 1.0,
-                color: Theme.of(context).colorScheme.outline,
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 24),
+              TaskTitleSection(
+                label: 'Tiêu đề công việc:',
+                title: widget.task.title,
+                screenWidth: screenWidth,
+                controller: _controller,
               ),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Text(
-                title,
-                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                    fontWeight: FontWeight.w400,
-                    color: Theme.of(context).colorScheme.onSurface),
+              const SizedBox(height: 24),
+              TaskInfoRow(
+                label1: "Nhân Viên",
+                value1: widget.task.creator,
               ),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildInfoRow(String label1, String value1, BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          '$label1:',
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.w600,
-              color: Theme.of(context).colorScheme.onBackground),
-        ),
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Container(
-            width: 200,
-            height: 40,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(8.0),
-              border: Border.all(
-                width: 1.0,
-                color: Theme.of(context).colorScheme.outline,
+              const SizedBox(height: 16),
+              TaskStatusPriorityRow(
+                label1: "Trạng Thái",
+                value1: _status,
+                onStatusSelected: (status) => _updateStatus(status),
+                label2: "Độ ưu tiên",
+                value2: _priority,
+                onPrioritySelected: (priority) => _updatePriority(priority),
               ),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Text(
-                value1,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
-                    color: Theme.of(context).colorScheme.onSurface),
+              const SizedBox(height: 16),
+              TaskDateRow(
+                label1: "Ngày bắt đầu",
+                date1: _startDate,
+                label2: "Ngày đến hạn",
+                date2: _dueDate,
+                onDateSelected: (newDate, isStartDate) {
+                  _updateDate(newDate, isStartDate);
+                },
               ),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildStatusPriorityRow(String label1, String value1, String label2,
-      String value2, BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        _buildDetailColumn(label1, value1, context),
-        _buildDetailColumn(label2, value2, context),
-      ],
-    );
-  }
-
-  Widget _buildDetailColumn(String label, String value, BuildContext context) {
-    return Expanded(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            label,
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.w600,
-                color: Theme.of(context).colorScheme.onBackground),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Container(
-              width: 150,
-              height: 40,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(8.0),
-                border: Border.all(
-                  width: 1.0,
-                  color: Theme.of(context).colorScheme.outline,
-                ),
+              const SizedBox(height: 16),
+              TaskNoteSection(
+                label: 'Note:',
+                note: widget.task.note,
+                screenWidth: screenWidth,
+                controllerNote: _controllerNote,
               ),
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text(
-                  value,
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        fontWeight: FontWeight.w500,
-                        color: label == "Trạng Thái"
-                            ? Colors.green
-                            : Theme.of(context).colorScheme.secondary,
-                      ),
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildDateRow(String label1, DateTime date1, String label2,
-      DateTime date2, BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        _buildDateDetailColumn(label1, date1, context),
-        _buildDateDetailColumn(label2, date2, context),
-      ],
-    );
-  }
-
-  Widget _buildDateDetailColumn(
-      String label, DateTime dateTime, BuildContext context) {
-    return Expanded(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            label,
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.w600,
-                color: Theme.of(context).colorScheme.onBackground),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Container(
-              width: 160,
-              height: 40,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(8.0),
-                border: Border.all(
-                  width: 1.0,
-                  color: Theme.of(context).colorScheme.outline,
-                ),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      _formatDate(dateTime),
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            fontWeight: FontWeight.w500,
-                            color: Theme.of(context).colorScheme.onSurface,
-                          ),
+              const SizedBox(height: 24),
+              Center(
+                child: ElevatedButton.icon(
+                  onPressed: _saveTask,
+                  icon: Icon(Icons.save),
+                  label: Text('Lưu'),
+                  style: ElevatedButton.styleFrom(
+                    minimumSize:
+                        Size(screenWidth, 48), // Độ rộng và chiều cao của nút
+                    backgroundColor: Colors.teal, // Màu nền của nút
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12.0), // Bo tròn góc
                     ),
-                    Text(
-                      _formatTime(dateTime),
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            fontWeight: FontWeight.w400,
-                            color:
-                                Theme.of(context).colorScheme.onSurfaceVariant,
-                          ),
-                    ),
-                  ],
+                    elevation: 4, // Độ nổi của nút
+                  ),
                 ),
               ),
-            ),
+            ],
           ),
-        ],
+        ),
       ),
     );
-  }
-
-  Widget _buildNoteSection(
-      String label, String note, BuildContext context, double screenWidth) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.w600,
-              color: Theme.of(context).colorScheme.onBackground),
-        ),
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Container(
-            width: screenWidth,
-            height: 80,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(8.0),
-              border: Border.all(
-                width: 1.0,
-                color: Theme.of(context).colorScheme.outline,
-              ),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Text(
-                note,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    fontWeight: FontWeight.w400,
-                    color: Theme.of(context).colorScheme.onSurface),
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  String _formatDate(DateTime dateTime) {
-    // Thay đổi định dạng ngày theo nhu cầu của bạn
-    return DateFormat('yyyy-MM-dd').format(dateTime);
-  }
-
-  String _formatTime(DateTime dateTime) {
-    // Thay đổi định dạng giờ theo nhu cầu của bạn
-    return DateFormat('h:mm a').format(dateTime);
   }
 }

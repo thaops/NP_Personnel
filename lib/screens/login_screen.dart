@@ -6,6 +6,7 @@ import 'package:hocflutter/screens/home_screen.dart';
 import 'package:hocflutter/services/lib/services/auth_service.dart';
 import 'package:hocflutter/widgets/custom_text_field.dart';
 import 'package:hocflutter/widgets/google_sign_in_button.dart';
+import 'package:provider/provider.dart';
 
 class LoginScreen extends StatelessWidget {
   final TextEditingController _usernameController = TextEditingController();
@@ -18,6 +19,7 @@ class LoginScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -49,12 +51,12 @@ class LoginScreen extends StatelessWidget {
               width: screenWidth,
               height: 50,
               decoration: BoxDecoration(
-                color: Colors.indigo, 
-                borderRadius: BorderRadius.circular(12), 
+                color: Colors.indigo,
+                borderRadius: BorderRadius.circular(12),
               ),
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                 backgroundColor: Colors.indigo,
+                  backgroundColor: Colors.indigo,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -76,7 +78,7 @@ class LoginScreen extends StatelessWidget {
             SizedBox(height: 20),
             Text(
               "Hoặc",
-              style: TextStyle(color: Colors.grey.shade600), 
+              style: TextStyle(color: Colors.grey.shade600),
             ),
             SizedBox(height: 20),
             GoogleSignInButton(
@@ -84,16 +86,24 @@ class LoginScreen extends StatelessWidget {
                 try {
                   User? user = await _authService.signInWithGoogle();
                   if (user != null) {
-                    final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
-                    final GoogleSignInAuthentication googleAuth = await googleUser!.authentication;
+                    final GoogleSignInAccount? googleUser =
+                        await _googleSignIn.signIn();
+                    final GoogleSignInAuthentication googleAuth =
+                        await googleUser!.authentication;
                     String? accessToken = googleAuth.accessToken;
                     if (accessToken != null) {
-                      var response = await _apiService.sendTokenToApi(accessToken);
+                      var response =
+                          await _apiService.sendTokenToApi(accessToken);
                       var accessTokenId = response.accessToken.toString();
+                      print("accessTokenId $accessTokenId");
                       if (response.statusCode == 200) {
+                        Provider.of<ApiService>(context, listen: false)
+                            .setAccessTokenId(accessTokenId);
                         Navigator.pushReplacement(
                           context,
-                          MaterialPageRoute(builder: (context) => HomeScreen(accessToken: accessTokenId)),
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  HomeScreen(accessToken: accessTokenId)),
                         );
                       } else {
                         ScaffoldMessenger.of(context).showSnackBar(

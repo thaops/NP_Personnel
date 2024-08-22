@@ -2,8 +2,8 @@ class ApiResponse {
   final int statusCode;
   final String message;
   final int totalRecord;
-  final Map<String, dynamic>? data;
-  final String? accessToken; // Thêm thuộc tính này
+  final Data? data; // Chuyển từ Map<String, dynamic>? thành Data?
+  final String? accessToken;
 
   ApiResponse({
     required this.statusCode,
@@ -14,21 +14,24 @@ class ApiResponse {
   });
 
   factory ApiResponse.fromJson(Map<String, dynamic> json) {
+    final dataJson =
+        json['data'] != null ? json['data'] as Map<String, dynamic> : null;
     return ApiResponse(
       statusCode: json['statusCode'],
       message: json['message'],
       totalRecord: json['totalRecord'],
-      data: json['data'],
-      accessToken: json['data']?['accessToken'], // Lấy accessToken từ dữ liệu JSON
+      data: dataJson != null
+          ? Data.fromJson(dataJson)
+          : null, 
+      accessToken: dataJson?['accessToken'], 
     );
   }
 }
 
-
 class Data {
-  String userId;
-  String accessToken;
-  String refreshToken;
+  final String userId;
+  final String accessToken;
+  final String refreshToken;
 
   Data({
     required this.userId,
