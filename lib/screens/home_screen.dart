@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hocflutter/Api/api_service.dart';
 import 'package:hocflutter/Api/models/task.dart';
 import 'package:hocflutter/screens/login_screen.dart';
@@ -9,7 +10,9 @@ import 'package:table_calendar/table_calendar.dart';
 
 class HomeScreen extends StatefulWidget {
   final String accessToken;
-  HomeScreen({required this.accessToken});
+  final dynamic state;
+  
+  HomeScreen({required this.accessToken, this.state});
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
@@ -232,20 +235,13 @@ class _HomeScreenState extends State<HomeScreen> {
                     final task = tasks![index];
                     return GestureDetector(
                       onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => TaskDetailScreen(task: task),
-                          ),
-                        ).then(
-                          (value) {
-                            if (value == true) {
-                              print("value: $value");
-                              _fetchTasks();
-                              print("value: $value");
-                            }
-                          },
-                        );
+                        GoRouter.of(context)
+                            .push('/details/tasks', extra: task)
+                            .then((value) {
+                          if (value == true) {
+                            _fetchTasks();
+                          }
+                        });
                       },
                       child: Card(
                         margin: const EdgeInsets.symmetric(vertical: 8),

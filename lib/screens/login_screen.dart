@@ -2,11 +2,13 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:hocflutter/Api/api_service.dart';
+import 'package:hocflutter/config/router/router.dart';
 import 'package:hocflutter/screens/home_screen.dart';
 import 'package:hocflutter/services/lib/services/auth_service.dart';
 import 'package:hocflutter/widgets/custom_text_field.dart';
 import 'package:hocflutter/widgets/google_sign_in_button.dart';
 import 'package:provider/provider.dart';
+import 'package:go_router/go_router.dart';
 
 class LoginScreen extends StatelessWidget {
   final TextEditingController _usernameController = TextEditingController();
@@ -96,14 +98,9 @@ class LoginScreen extends StatelessWidget {
                           await _apiService.sendTokenToApi(accessToken);
                       var accessTokenId = response.accessToken.toString();
                       if (response.statusCode == 200) {
-                        Provider.of<ApiService>(context, listen: false)
+                          Provider.of<ApiService>(context, listen: false)
                             .setAccessTokenId(accessTokenId);
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) =>
-                                  HomeScreen(accessToken: accessTokenId)),
-                        );
+                        context.go('/home/$accessTokenId');
                       } else {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(content: Text('Xác thực thất bại')),
