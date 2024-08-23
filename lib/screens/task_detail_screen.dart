@@ -10,6 +10,7 @@ import 'package:provider/provider.dart';
 
 class TaskDetailScreen extends StatefulWidget {
   final Task task;
+
   TaskDetailScreen({required this.task});
 
   @override
@@ -72,15 +73,14 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
 
     Map<String, dynamic> updateData = {
       'title': _controller.text,
-      'note': _controllerNote.text,
-      'startDate': _startDate.toIso8601String(),
-      'dueDate': _dueDate.toIso8601String(),
-      'state': _status,
-      'priority': _priority,
+      // 'note': _controllerNote.text,
+      // 'startDate': _startDate.toIso8601String(),
+      // 'dueDate': _dueDate.toIso8601String(),
+      // 'state': _status,
+      // 'priority': _priority,
     };
 
     print("Update Data: $updateData");
-    print("taskId: $taskId");
 
     final response =
         await apiService.updateTask(taskId, accessToken, updateData);
@@ -92,7 +92,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Cập nhật Task Thành công')),
       );
-      Navigator.pop(context);
+      Navigator.pop(context, true);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Cập nhật Task Thất bại: ${response.message}')),
@@ -102,6 +102,8 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final taskId = widget.task.id;
+    print("taskId: $taskId");
     final screenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
       appBar: AppBar(

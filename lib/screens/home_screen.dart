@@ -24,7 +24,8 @@ class _HomeScreenState extends State<HomeScreen> {
   List<DateTime> selectedDays = [];
   List<Task>? tasks;
 
-  final DateFormat dateFormat = DateFormat('yyyy-MM-dd');
+  final DateFormat dateFormat = DateFormat('yyyy-MM-dd HH:mm:ss.SSS');
+  final DateFormat dateFormatD = DateFormat('yyyy-MM-dd');
   void _checkAndFetchTasks() {
     if (_startDate != null && _endDate != null) {
       _fetchTasks();
@@ -55,7 +56,6 @@ class _HomeScreenState extends State<HomeScreen> {
   void _onDaySelected(DateTime selectedDay, DateTime focusedDay) {
     setState(() {
       _focusedDay = focusedDay;
-
       if (_startDate == null) {
         _startDate = selectedDay;
         selectedDays.clear();
@@ -71,8 +71,10 @@ class _HomeScreenState extends State<HomeScreen> {
       selectedDays.sort((a, b) => a.compareTo(b));
 
       if (selectedDays.isNotEmpty) {
-        _startDate = selectedDays.first;
-        _endDate = selectedDays.last;
+        _startDate = DateTime(selectedDays.first.year, selectedDays.first.month,
+            selectedDays.first.day, 0, 0, 0);
+        _endDate = DateTime(selectedDays.last.year, selectedDays.last.month,
+            selectedDays.last.day, 23, 59, 59);
       } else {
         _startDate = null;
         _endDate = null;
@@ -214,7 +216,7 @@ class _HomeScreenState extends State<HomeScreen> {
               Divider(),
               SizedBox(height: 20),
               Text(
-                "Tasks on ${_startDate != null ? dateFormat.format(_startDate!) : 'Unknown Date'} - ${_endDate != null ? dateFormat.format(_endDate!) : 'Unknown Date'}",
+                "Tasks on ${_startDate != null ? dateFormatD.format(_startDate!) : 'Unknown Date'} - ${_endDate != null ? dateFormatD.format(_endDate!) : 'Unknown Date'}",
                 style: TextStyle(
                   color: Colors.black,
                   fontWeight: FontWeight.bold,
@@ -235,6 +237,14 @@ class _HomeScreenState extends State<HomeScreen> {
                           MaterialPageRoute(
                             builder: (context) => TaskDetailScreen(task: task),
                           ),
+                        ).then(
+                          (value) {
+                            if (value == true) {
+                              print("value: $value");
+                              _fetchTasks();
+                              print("value: $value");
+                            }
+                          },
                         );
                       },
                       child: Card(

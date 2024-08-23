@@ -13,16 +13,18 @@
 //         builder: (context, state) => LoginScreen(),
 //       ),
 //       GoRoute(
-//         path: '/home',
-//         builder: (context, state) => HomeScreen(),
+//         path: '/home/:accessToken',
+//         builder: (context, state) {
+//           final accessToken = state.queryParameters['accessToken'] ?? '';
+//           return HomeScreen(accessToken: accessToken);
+//         },
 //       ),
 //       GoRoute(
 //         path: '/details/:id',
 //         builder: (context, state) {
-//           // Lấy id từ state
-//           final taskId = state.params['id']!;
-//           final task = _findTaskById(taskId);
-//           return TaskDetailScreen(task: task);
+//           final id = state.pathParameters['id']!;
+//           final task = _findTaskById(id); // Thay thế bằng logic tìm task thực tế
+//           return TaskDetailScreen(task: task!);
 //         },
 //       ),
 //     ],
@@ -30,8 +32,6 @@
 
 //   Task? _findTaskById(String id) {
 //     // Thực hiện tìm kiếm task dựa trên id
-//     // Ví dụ, nếu bạn có danh sách tasks, bạn có thể tìm kiếm như sau:
-//     // return tasks.firstWhere((task) => task.id == id, orElse: () => null);
 //     return null; // Thay đổi thành logic tìm kiếm task thực tế
 //   }
 // }

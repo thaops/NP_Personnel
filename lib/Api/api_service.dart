@@ -19,9 +19,10 @@ class ApiService extends ChangeNotifier {
   String err = '';
   Future<taskResponse> updateTask(String taskId, String accessToken,
       Map<String, dynamic> updateData) async {
-    final String url = '$_baseUrl/tasks/?id=$taskId';
+    final String url = '$_baseUrl/tasks/$taskId';
+    print("url : $url");
     try {
-      final response = await http.post(
+      final response = await http.put(
         Uri.parse(url),
         headers: {
           'Authorization': 'Bearer $accessToken',
@@ -29,10 +30,9 @@ class ApiService extends ChangeNotifier {
         },
         body: jsonEncode(updateData),
       );
-      // In ra chi tiết thông tin phản hồi
+
       print("Response Status: ${response.statusCode}");
       print("Response Body api: ${response.body}");
-      
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = jsonDecode(response.body);
@@ -63,6 +63,7 @@ class ApiService extends ChangeNotifier {
       },
       body: json.encode({'token': token}),
     );
+
     if (response.statusCode == 200) {
       return ApiResponse.fromJson(json.decode(response.body));
     } else {
@@ -78,7 +79,7 @@ class ApiService extends ChangeNotifier {
   Future<List<Task>> fetchTasks(
       String accessToken, DateTime startDate, DateTime endDate) async {
     final url = Uri.parse(
-      '$_baseUrl/tasks?StartDate=${startDate.toIso8601String()}&EndDate=${endDate.toIso8601String()}&ForMe=false',
+      '$_baseUrl/tasks?project=09764aab-bfe7-4602-b416-0a9057ceda5d&page=1&pageSize=50&StartDate=${startDate.toIso8601String()}&EndDate=${endDate.toIso8601String()}&ForMe=false',
     );
 
     final response = await http.get(
@@ -90,6 +91,7 @@ class ApiService extends ChangeNotifier {
 
     if (response.statusCode == 200) {
       final responseData = json.decode(response.body);
+      print("response: $url");
       final taskDataList = responseData['data'] as List<dynamic>;
       final tasks = taskDataList
           .expand((item) => (item['tasks'] as List<dynamic>))

@@ -95,7 +95,6 @@ class LoginScreen extends StatelessWidget {
                       var response =
                           await _apiService.sendTokenToApi(accessToken);
                       var accessTokenId = response.accessToken.toString();
-                      print("accessTokenId $accessTokenId");
                       if (response.statusCode == 200) {
                         Provider.of<ApiService>(context, listen: false)
                             .setAccessTokenId(accessTokenId);

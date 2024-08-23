@@ -60,12 +60,12 @@ class TaskStatusPriorityRow extends StatelessWidget {
                     if (label == "Trạng Thái") {
                       options = [
                         PopupMenuItem<String>(
-                          value: 'Pending',
+                          value: 'Backlog',
                           child: Row(
                             children: [
                               Icon(Icons.hourglass_empty, color: Colors.orange),
                               const SizedBox(width: 8),
-                              Text('Pending'),
+                              Text('Backlog'),
                             ],
                           ),
                         ),
@@ -80,12 +80,22 @@ class TaskStatusPriorityRow extends StatelessWidget {
                           ),
                         ),
                         PopupMenuItem<String>(
-                          value: 'Completed',
+                          value: 'Pending',
+                          child: Row(
+                            children: [
+                              Icon(Icons.pending, color: Colors.red),
+                              const SizedBox(width: 8),
+                              Text('Pending'),
+                            ],
+                          ),
+                        ),
+                        PopupMenuItem<String>(
+                          value: 'Done',
                           child: Row(
                             children: [
                               Icon(Icons.check_circle, color: Colors.green),
                               const SizedBox(width: 8),
-                              Text('Completed'),
+                              Text('Done'),
                             ],
                           ),
                         ),
