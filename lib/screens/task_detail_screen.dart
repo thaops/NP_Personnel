@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hocflutter/Api/api_service.dart';
 import 'package:hocflutter/Api/models/task.dart';
+import 'package:hocflutter/config/constants/colors.dart';
 import 'package:hocflutter/widgets/task_title_section.dart';
 import 'package:hocflutter/widgets/task_info_row.dart';
 import 'package:hocflutter/widgets/task_status_priority_row.dart';
@@ -115,7 +116,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
               ),
         ),
         elevation: 4,
-        backgroundColor: Colors.teal,
+        backgroundColor: dark_blue,
         toolbarHeight: 80,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(
@@ -184,7 +185,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
                   style: ElevatedButton.styleFrom(
                     minimumSize:
                         Size(screenWidth, 48), // Độ rộng và chiều cao của nút
-                    backgroundColor: Colors.teal, // Màu nền của nút
+                    backgroundColor: dark_blue, // Màu nền của nút
                     foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12.0), // Bo tròn góc

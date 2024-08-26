@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hocflutter/Api/api_service.dart';
 import 'package:hocflutter/Api/models/task.dart';
+import 'package:hocflutter/config/constants/colors.dart';
+import 'package:hocflutter/config/router/custom_bottom_navigation_bar.dart';
 import 'package:hocflutter/screens/login_screen.dart';
 import 'package:hocflutter/screens/task_detail_screen.dart';
 import 'package:hocflutter/services/lib/services/auth_service.dart';
@@ -10,9 +12,7 @@ import 'package:table_calendar/table_calendar.dart';
 
 class HomeScreen extends StatefulWidget {
   final String accessToken;
-  final dynamic state;
-  
-  HomeScreen({required this.accessToken, this.state});
+  HomeScreen({required this.accessToken});
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
@@ -96,6 +96,27 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  void _onTabTapped(int index) {
+    // Handle navigation based on tab index
+    switch (index) {
+      case 0:
+        // Navigate to Home
+        break;
+      case 1:
+        // Navigate to Search
+        break;
+      case 2:
+        // Navigate to Add
+        break;
+      case 3:
+        // Navigate to Notifications
+        break;
+      case 4:
+        // Navigate to Profile
+        break;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
@@ -110,7 +131,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         child: Center(
           child: Column(
             children: [
@@ -164,7 +185,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
                 availableGestures: AvailableGestures.all,
-                rowHeight: 65,
+                rowHeight: 55,
                 selectedDayPredicate: (day) {
                   return isSameDay(day, _startDate) || isSameDay(day, _endDate);
                 },
@@ -184,9 +205,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     color: Colors.white,
                     shape: BoxShape.rectangle,
                     borderRadius: BorderRadius.circular(8.0),
-                    border: Border.all(
-                        color: Colors.grey.shade300,
-                        width: 1.0), // Đường viền mỏng
+                    border: Border.all(color: Colors.grey.shade300, width: 1.0),
                   ),
                   weekendDecoration: BoxDecoration(
                     color: Colors.white,
@@ -201,18 +220,18 @@ class _HomeScreenState extends State<HomeScreen> {
                     border: Border.all(color: Colors.grey.shade300, width: 1.0),
                   ),
                   todayDecoration: BoxDecoration(
-                    color: Colors.teal.shade50,
+                    color: Colors.blue.shade300,
                     shape: BoxShape.rectangle,
                     borderRadius: BorderRadius.circular(8.0),
-                    border: Border.all(color: Colors.teal.shade200, width: 1.0),
+                    border: Border.all(color: Colors.blue.shade200, width: 1.0),
                   ),
                   selectedDecoration: BoxDecoration(
-                    color: Colors.teal,
+                    color: dark_blue,
                     shape: BoxShape.rectangle,
                     borderRadius: BorderRadius.circular(8.0),
-                    border: Border.all(color: Colors.teal.shade700, width: 1.0),
+                    border: Border.all(color: Colors.blue.shade300, width: 1.0),
                   ),
-                  rangeHighlightColor: Colors.teal.shade100.withOpacity(0.5),
+                  rangeHighlightColor: Colors.blue.shade100.withOpacity(0.5),
                 ),
               ),
               SizedBox(height: 20),
@@ -271,17 +290,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 )
               else
                 Padding(
-                  padding: const EdgeInsets.only(top: 30),
+                  padding: const EdgeInsets.only(top: 16),
                   child: Column(
                     children: [
-                      Text(
-                        'No tasks available',
-                        style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.teal),
-                      ),
-                      SizedBox(height: 16),
                       Image.asset(
                         'assets/notdata.png',
                         height: 150,
@@ -294,6 +305,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
       ),
+      bottomNavigationBar: CustomBottomNavigationBar(onTap: _onTabTapped),
     );
   }
 }

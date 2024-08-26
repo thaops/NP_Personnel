@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:hocflutter/Api/api_service.dart';
+import 'package:hocflutter/config/constants/colors.dart';
 import 'package:hocflutter/config/router/router.dart';
 import 'package:hocflutter/screens/home_screen.dart';
 import 'package:hocflutter/services/lib/services/auth_service.dart';
@@ -58,7 +59,7 @@ class LoginScreen extends StatelessWidget {
               ),
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.indigo,
+                  backgroundColor: dark_blue,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
