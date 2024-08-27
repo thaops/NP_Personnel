@@ -1,3 +1,4 @@
+
 class Task {
   final String id;
   final String title;
@@ -6,6 +7,7 @@ class Task {
   final String priority;
   final String creator;
   final String note;
+  final String project;
   final DateTime startDate;
   final DateTime dueDate;
 
@@ -17,6 +19,7 @@ class Task {
     required this.priority,
     required this.creator,
     required this.note,
+    required this.project,
     required this.startDate,
     required this.dueDate,
   });
@@ -30,13 +33,18 @@ class Task {
       priority: json['priority'] ?? '',
       creator: json['creator'] ?? '',
       note: json['note'] ?? '',
-      startDate: json['startDate'] != null ? DateTime.parse(json['startDate']) : DateTime.now(),
-      dueDate: json['dueDate'] != null ? DateTime.parse(json['dueDate']) : DateTime.now(),
+      project: json['project'] ?? '', 
+      startDate: json['startDate'] != null
+          ? DateTime.parse(json['startDate'])
+          : DateTime.now(),
+      dueDate: json['dueDate'] != null
+          ? DateTime.parse(json['dueDate'])
+          : DateTime.now(),
     );
   }
 
   @override
   String toString() {
-    return 'Task{id: $id, title: $title, description: $description, state: $state, priority: $priority, creator: $creator, note: $note, startDate: $startDate, dueDate: $dueDate}';
+    return 'Task{id: $id, title: $title, description: $description, state: $state, priority: $priority, creator: $creator, note: $note, project: $project, startDate: $startDate, dueDate: $dueDate}';
   }
 }

@@ -75,9 +75,9 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
 
     Map<String, dynamic> updateData = {
       'title': _controller.text,
-      // 'note': _controllerNote.text,
-      // 'startDate': _startDate.toIso8601String(),
-      // 'dueDate': _dueDate.toIso8601String(),
+      'note': _controllerNote.text,
+      'startDate': _startDate.toIso8601String(),
+      'dueDate': _dueDate.toIso8601String(),
       // 'state': _status,
       // 'priority': _priority,
     };
@@ -184,14 +184,13 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
                   icon: Icon(Icons.save),
                   label: Text('Lưu'),
                   style: ElevatedButton.styleFrom(
-                    minimumSize:
-                        Size(screenWidth, 48), 
-                    backgroundColor: dark_blue, 
+                    minimumSize: Size(screenWidth, 48),
+                    backgroundColor: dark_blue,
                     foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12.0), 
+                      borderRadius: BorderRadius.circular(12.0),
                     ),
-                    elevation: 4, 
+                    elevation: 4,
                   ),
                 ),
               ),

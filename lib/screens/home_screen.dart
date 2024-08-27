@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:hocflutter/Api/api_service.dart';
 import 'package:hocflutter/Api/models/task.dart';
 import 'package:hocflutter/config/constants/colors.dart';
+import 'package:hocflutter/screens/bottomSheet/task_bottomsheet.dart';
 
 import 'package:hocflutter/screens/login_screen.dart';
 import 'package:hocflutter/screens/task_detail_screen.dart';
@@ -87,13 +88,18 @@ class _HomeScreenState extends State<HomeScreen> {
     _checkAndFetchTasks();
   }
 
+  void _updateTaskList(bool update) {
+    if (update) {
+      _fetchTasks(); 
+    }
+  }
+
   final AuthService _authService = AuthService();
 
-Future<void> _signOut() async {
-  await _authService.signOut();
-  context.go('/login', extra: {'replace': true});
-}
-
+  Future<void> _signOut() async {
+    await _authService.signOut();
+    context.go('/login', extra: {'replace': true});
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -136,22 +142,27 @@ Future<void> _signOut() async {
                     final task = tasks![index];
                     return GestureDetector(
                       onTap: () {
-                        GoRouter.of(context)
-                            .push('/details/tasks', extra: task)
-                            .then((value) {
-                          if (value == true) {
-                            _fetchTasks();
-                          }
-                        });
+                        showModalBottomSheet(
+                          context: context,
+                          builder: (context) => TaskBottomsheet(
+                            task: task,
+                            onUpdateCallback: _updateTaskList,
+                          ),
+                        );
                       },
                       child: Card(
                         margin: const EdgeInsets.symmetric(vertical: 8),
                         child: ListTile(
                           contentPadding:
                               const EdgeInsets.symmetric(horizontal: 16),
-                          title: Text(
-                            task.title,
-                            style: TextStyle(fontWeight: FontWeight.bold),
+                          title: Container(
+                            width: screenWidth * 0.7,
+                            child: Text(
+                              task.title,
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                            ),
                           ),
                           trailing: Row(
                             mainAxisSize: MainAxisSize.min,

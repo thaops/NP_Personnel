@@ -29,7 +29,7 @@ class AppRouter {
           final task = state.extra as Task?;
           if (task == null) {
             return Scaffold(
-              body: Center(child: Text('No task data')),
+              body: const Center(child: Text('No task data')),
             );
           }
           return TaskDetailScreen(task: task);

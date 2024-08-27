@@ -55,6 +55,64 @@ class ApiService extends ChangeNotifier {
     }
   }
 
+  Future<Task?> getTask(String taskId, String accessToken) async {
+    final String url = '$_baseUrl/tasks/$taskId';
+    print("url : $url");
+
+    try {
+      final response = await http.get(
+        Uri.parse(url),
+        headers: {
+          'Authorization': 'Bearer $accessToken',
+          'Content-Type': 'application/json',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> jsonResponse = json.decode(response.body);
+        final Map<String, dynamic> taskJson = jsonResponse['data'];
+        return Task.fromJson(taskJson);
+      } else {
+        print('Failed to load task');
+        return null;
+      }
+    } catch (e) {
+      print('Error: $e');
+      return null;
+    }
+  }
+
+Future<bool> deleteTask(String taskId, String accessToken) async {
+  final String url = '$_baseUrl/tasks/$taskId';
+  print("url : $url");
+
+  try {
+    final response = await http.delete(
+      Uri.parse(url),
+      headers: {
+        'Authorization': 'Bearer $accessToken',
+        'Content-Type': 'application/json',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      print('Task deleted successfully');
+      return true;
+    } else {
+      print('Failed to delete task');
+      return false;
+    }
+  } catch (e) {
+    print('Error: $e');
+    return false;
+  }
+}
+
+
+
+  
+
+
   Future<ApiResponse> sendTokenToApi(String token) async {
     final response = await http.post(
       Uri.parse('https://napro-api.azurewebsites.net/api/users/oauth2-google'),
