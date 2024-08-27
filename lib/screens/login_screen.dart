@@ -101,7 +101,7 @@ class LoginScreen extends StatelessWidget {
                       if (response.statusCode == 200) {
                           Provider.of<ApiService>(context, listen: false)
                             .setAccessTokenId(accessTokenId);
-                        context.go('/home/$accessTokenId');
+                        context.go('/main');
                       } else {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(content: Text('Xác thực thất bại')),

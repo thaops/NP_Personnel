@@ -1,25 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:hocflutter/Api/api_service.dart';
-import 'package:hocflutter/Api/models/task.dart';
 import 'package:hocflutter/config/constants/colors.dart';
-import 'package:hocflutter/widgets/task_title_section.dart';
-import 'package:hocflutter/widgets/task_info_row.dart';
-import 'package:hocflutter/widgets/task_status_priority_row.dart';
 import 'package:hocflutter/widgets/task_date_row.dart';
+import 'package:hocflutter/widgets/task_info_row.dart';
 import 'package:hocflutter/widgets/task_note_section.dart';
-import 'package:provider/provider.dart';
+import 'package:hocflutter/widgets/task_status_priority_row.dart';
+import 'package:hocflutter/widgets/task_title_section.dart';
 
-class TaskDetailScreen extends StatefulWidget {
-  final Task task;
-
-  TaskDetailScreen({required this.task});
+class AddScreen extends StatefulWidget {
+  const AddScreen({super.key});
 
   @override
-  // ignore: library_private_types_in_public_api
-  _TaskDetailScreenState createState() => _TaskDetailScreenState();
+  State<AddScreen> createState() => _AddScreenState();
 }
 
-class _TaskDetailScreenState extends State<TaskDetailScreen> {
+class _AddScreenState extends State<AddScreen> {
   ApiService apiService = ApiService();
   late TextEditingController _controller;
   late TextEditingController _controllerNote;
@@ -31,29 +26,12 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
   @override
   void initState() {
     super.initState();
-    _controller = TextEditingController(text: widget.task.title);
-    _controllerNote = TextEditingController(text: widget.task.note);
-    _startDate = widget.task.startDate;
-    _dueDate = widget.task.dueDate;
-    _status = widget.task.state;
-    _priority = widget.task.priority;
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    _controllerNote.dispose();
-    super.dispose();
-  }
-
-  void _updateDate(DateTime newDate, bool isStartDate) {
-    setState(() {
-      if (isStartDate) {
-        _startDate = newDate;
-      } else {
-        _dueDate = newDate;
-      }
-    });
+    _controller = TextEditingController();
+    _controllerNote = TextEditingController();
+    _startDate = DateTime.now();
+    _dueDate = DateTime.now().add(Duration(days: 7));
+    _status = '';
+    _priority = '';
   }
 
   void _updateStatus(String newStatus) {
@@ -68,49 +46,34 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
     });
   }
 
-  void _saveTask() async {
-    final apiService = Provider.of<ApiService>(context, listen: false);
-    final accessToken = apiService.accessTokenId;
-    final taskId = widget.task.id;
-
-    Map<String, dynamic> updateData = {
-      'title': _controller.text,
-      // 'note': _controllerNote.text,
-      // 'startDate': _startDate.toIso8601String(),
-      // 'dueDate': _dueDate.toIso8601String(),
-      // 'state': _status,
-      // 'priority': _priority,
-    };
-
-    print("Update Data: $updateData");
-
-    final response =
-        await apiService.updateTask(taskId, accessToken, updateData);
-
-    print("Response Status: ${response.statusCode}");
-    print("Response Body: ${response.message}");
-
-    if (response.statusCode == 200) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Cập nhật Task Thành công')),
-      );
-      Navigator.pop(context, true);
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Cập nhật Task Thất bại: ${response.message}')),
-      );
-    }
+  void _updateDate(DateTime newDate, bool isStartDate) {
+    setState(() {
+      if (isStartDate) {
+        _startDate = newDate;
+      } else {
+        _dueDate = newDate;
+      }
+    });
   }
+
+void _saveTask() {
+  print('Tiêu đề công việc: ${_controller.text}');
+  print('Nhân Viên: ');
+  print('Trạng Thái: $_status');
+  print('Độ ưu tiên: $_priority');
+  print('Ngày bắt đầu: $_startDate');
+  print('Ngày đến hạn: $_dueDate');
+  print('Ghi chú: ${_controllerNote.text}');
+}
+
 
   @override
   Widget build(BuildContext context) {
-    final taskId = widget.task.id;
-    print("taskId: $taskId");
     final screenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Task Details',
+          'Add Task',
           style: Theme.of(context).textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.bold,
                 color: Colors.white,
@@ -142,23 +105,23 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
               const SizedBox(height: 24),
               TaskTitleSection(
                 label: 'Tiêu đề công việc:',
-                title: widget.task.title,
+                title: '',
                 screenWidth: screenWidth,
                 controller: _controller,
               ),
               const SizedBox(height: 24),
               TaskInfoRow(
                 label1: "Nhân Viên",
-                value1: widget.task.creator,
+                value1: '',
               ),
               const SizedBox(height: 16),
               TaskStatusPriorityRow(
                 label1: "Trạng Thái",
                 value1: _status,
-                onStatusSelected: (status) => _updateStatus(status),
+                onStatusSelected: _updateStatus,
                 label2: "Độ ưu tiên",
                 value2: _priority,
-                onPrioritySelected: (priority) => _updatePriority(priority),
+                onPrioritySelected: _updatePriority,
               ),
               const SizedBox(height: 16),
               TaskDateRow(
@@ -166,14 +129,13 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
                 date1: _startDate,
                 label2: "Ngày đến hạn",
                 date2: _dueDate,
-                onDateSelected: (newDate, isStartDate) {
-                  _updateDate(newDate, isStartDate);
-                },
+                onDateSelected: _updateDate,
               ),
               const SizedBox(height: 16),
               TaskNoteSection(
                 label: 'Note:',
-                note: widget.task.note,
+                note:
+                    '', 
                 screenWidth: screenWidth,
                 controllerNote: _controllerNote,
               ),
@@ -185,13 +147,13 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
                   label: Text('Lưu'),
                   style: ElevatedButton.styleFrom(
                     minimumSize:
-                        Size(screenWidth, 48), 
-                    backgroundColor: dark_blue, 
+                        Size(screenWidth, 48), // Độ rộng và chiều cao của nút
+                    backgroundColor: dark_blue, // Màu nền của nút
                     foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12.0), 
+                      borderRadius: BorderRadius.circular(12.0), // Bo tròn góc
                     ),
-                    elevation: 4, 
+                    elevation: 4, // Độ nổi của nút
                   ),
                 ),
               ),

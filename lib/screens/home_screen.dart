@@ -3,7 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:hocflutter/Api/api_service.dart';
 import 'package:hocflutter/Api/models/task.dart';
 import 'package:hocflutter/config/constants/colors.dart';
-import 'package:hocflutter/config/router/custom_bottom_navigation_bar.dart';
+
 import 'package:hocflutter/screens/login_screen.dart';
 import 'package:hocflutter/screens/task_detail_screen.dart';
 import 'package:hocflutter/services/lib/services/auth_service.dart';
@@ -89,33 +89,11 @@ class _HomeScreenState extends State<HomeScreen> {
 
   final AuthService _authService = AuthService();
 
-  Future<void> _signOut() async {
-    await _authService.signOut();
-    Navigator.of(context).pushReplacement(
-      MaterialPageRoute(builder: (context) => LoginScreen()),
-    );
-  }
+Future<void> _signOut() async {
+  await _authService.signOut();
+  context.go('/login', extra: {'replace': true});
+}
 
-  void _onTabTapped(int index) {
-    // Handle navigation based on tab index
-    switch (index) {
-      case 0:
-        // Navigate to Home
-        break;
-      case 1:
-        // Navigate to Search
-        break;
-      case 2:
-        // Navigate to Add
-        break;
-      case 3:
-        // Navigate to Notifications
-        break;
-      case 4:
-        // Navigate to Profile
-        break;
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -135,105 +113,9 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Center(
           child: Column(
             children: [
-              Container(
-                height: 50,
-                width: screenWidth,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  border: Border.all(color: Colors.grey.shade300),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 0, 8, 0),
-                  child: TextField(
-                    textAlignVertical: TextAlignVertical.center,
-                    decoration: InputDecoration(
-                      hintText: 'Search...',
-                      hintStyle: TextStyle(color: Colors.grey.shade500),
-                      border: InputBorder.none,
-                      suffixIcon: Icon(
-                        Icons.search,
-                        size: 24,
-                        color: Colors.grey.shade500,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
+              _buidlSearch(),
               SizedBox(height: 16),
-              TableCalendar(
-                headerStyle: HeaderStyle(
-                  formatButtonVisible: false,
-                  titleCentered: true,
-                  headerMargin: EdgeInsets.only(bottom: 16),
-                  titleTextStyle: TextStyle(
-                    fontSize: 20.0,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black87,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius:
-                        BorderRadius.vertical(top: Radius.circular(12)),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
-                        offset: Offset(0, 4),
-                        blurRadius: 8,
-                      ),
-                    ],
-                  ),
-                ),
-                availableGestures: AvailableGestures.all,
-                rowHeight: 55,
-                selectedDayPredicate: (day) {
-                  return isSameDay(day, _startDate) || isSameDay(day, _endDate);
-                },
-                focusedDay: _focusedDay,
-                firstDay: DateTime.utc(2010, 08, 08),
-                lastDay: DateTime.utc(2025, 12, 12),
-                onDaySelected: _onDaySelected,
-                onPageChanged: (focusedDay) {
-                  setState(() {
-                    _focusedDay = focusedDay;
-                  });
-                },
-                calendarStyle: CalendarStyle(
-                  cellMargin: EdgeInsets.all(6.0),
-                  outsideDaysVisible: false,
-                  defaultDecoration: BoxDecoration(
-                    color: Colors.white,
-                    shape: BoxShape.rectangle,
-                    borderRadius: BorderRadius.circular(8.0),
-                    border: Border.all(color: Colors.grey.shade300, width: 1.0),
-                  ),
-                  weekendDecoration: BoxDecoration(
-                    color: Colors.white,
-                    shape: BoxShape.rectangle,
-                    borderRadius: BorderRadius.circular(8.0),
-                    border: Border.all(color: Colors.grey.shade300, width: 1.0),
-                  ),
-                  outsideDecoration: BoxDecoration(
-                    color: Colors.white,
-                    shape: BoxShape.rectangle,
-                    borderRadius: BorderRadius.circular(8.0),
-                    border: Border.all(color: Colors.grey.shade300, width: 1.0),
-                  ),
-                  todayDecoration: BoxDecoration(
-                    color: Colors.blue.shade300,
-                    shape: BoxShape.rectangle,
-                    borderRadius: BorderRadius.circular(8.0),
-                    border: Border.all(color: Colors.blue.shade200, width: 1.0),
-                  ),
-                  selectedDecoration: BoxDecoration(
-                    color: dark_blue,
-                    shape: BoxShape.rectangle,
-                    borderRadius: BorderRadius.circular(8.0),
-                    border: Border.all(color: Colors.blue.shade300, width: 1.0),
-                  ),
-                  rangeHighlightColor: Colors.blue.shade100.withOpacity(0.5),
-                ),
-              ),
+              _buildTable(),
               SizedBox(height: 20),
               Divider(),
               SizedBox(height: 20),
@@ -289,23 +171,130 @@ class _HomeScreenState extends State<HomeScreen> {
                   },
                 )
               else
-                Padding(
-                  padding: const EdgeInsets.only(top: 16),
-                  child: Column(
-                    children: [
-                      Image.asset(
-                        'assets/notdata.png',
-                        height: 150,
-                        width: 150,
-                      ),
-                    ],
-                  ),
-                ),
+                _buidlFreetime()
             ],
           ),
         ),
       ),
-      bottomNavigationBar: CustomBottomNavigationBar(onTap: _onTabTapped),
+    );
+  }
+
+  Widget _buildTable() {
+    return TableCalendar(
+      headerStyle: HeaderStyle(
+        formatButtonVisible: false,
+        titleCentered: true,
+        headerMargin: EdgeInsets.only(bottom: 16),
+        titleTextStyle: TextStyle(
+          fontSize: 20.0,
+          fontWeight: FontWeight.bold,
+          color: Colors.black87,
+        ),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              offset: Offset(0, 4),
+              blurRadius: 8,
+            ),
+          ],
+        ),
+      ),
+      availableGestures: AvailableGestures.all,
+      rowHeight: 55,
+      selectedDayPredicate: (day) {
+        return isSameDay(day, _startDate) || isSameDay(day, _endDate);
+      },
+      focusedDay: _focusedDay,
+      firstDay: DateTime.utc(2010, 08, 08),
+      lastDay: DateTime.utc(2025, 12, 12),
+      onDaySelected: _onDaySelected,
+      onPageChanged: (focusedDay) {
+        setState(() {
+          _focusedDay = focusedDay;
+        });
+      },
+      calendarStyle: CalendarStyle(
+        cellMargin: EdgeInsets.all(6.0),
+        outsideDaysVisible: false,
+        defaultDecoration: BoxDecoration(
+          color: Colors.white,
+          shape: BoxShape.rectangle,
+          borderRadius: BorderRadius.circular(8.0),
+          border: Border.all(color: Colors.grey.shade300, width: 1.0),
+        ),
+        weekendDecoration: BoxDecoration(
+          color: Colors.white,
+          shape: BoxShape.rectangle,
+          borderRadius: BorderRadius.circular(8.0),
+          border: Border.all(color: Colors.grey.shade300, width: 1.0),
+        ),
+        outsideDecoration: BoxDecoration(
+          color: Colors.white,
+          shape: BoxShape.rectangle,
+          borderRadius: BorderRadius.circular(8.0),
+          border: Border.all(color: Colors.grey.shade300, width: 1.0),
+        ),
+        todayDecoration: BoxDecoration(
+          color: Colors.indigo.shade200,
+          shape: BoxShape.rectangle,
+          borderRadius: BorderRadius.circular(8.0),
+          border: Border.all(color: dark_blue, width: 1.0),
+        ),
+        selectedDecoration: BoxDecoration(
+          color: dark_blue,
+          shape: BoxShape.rectangle,
+          borderRadius: BorderRadius.circular(8.0),
+          border: Border.all(color: Colors.blue.shade300, width: 1.0),
+        ),
+        rangeHighlightColor: Colors.blue.shade100.withOpacity(0.5),
+      ),
+    );
+  }
+
+  Widget _buidlSearch() {
+    final screenWidth = MediaQuery.of(context).size.width;
+    return Container(
+      height: 50,
+      width: screenWidth,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border.all(color: Colors.grey.shade300),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 0, 8, 0),
+        child: TextField(
+          textAlignVertical: TextAlignVertical.center,
+          decoration: InputDecoration(
+            hintText: 'Search...',
+            hintStyle: TextStyle(color: Colors.grey.shade500),
+            border: InputBorder.none,
+            suffixIcon: Icon(
+              Icons.search,
+              size: 24,
+              color: Colors.grey.shade500,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buidlFreetime() {
+    return Padding(
+      padding: const EdgeInsets.only(top: 0),
+      child: Column(
+        children: [
+          Image.asset(
+            'assets/solutions.png',
+            height: 150,
+            width: 300,
+          ),
+        ],
+      ),
     );
   }
 }
