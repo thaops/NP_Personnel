@@ -2,7 +2,7 @@ class ApiResponse {
   final int statusCode;
   final String message;
   final int totalRecord;
-  final Data? data; // Chuyển từ Map<String, dynamic>? thành Data?
+  final Data? data; 
   final String? accessToken;
 
   ApiResponse({

@@ -52,7 +52,7 @@ class _MainScreenState extends State<MainScreen> {
           TabItem(icon: Icons.home, title: 'Home'),
           TabItem(icon: Icons.search, title: 'Search'),
           TabItem(icon: Icons.add, title: 'Add'),
-          TabItem(icon: Icons.notifications, title: 'Notification'),
+          TabItem(icon: Icons.notifications, title: 'Notifi'),
           TabItem(icon: Icons.person, title: 'Profile'),
         ],
         style: TabStyle.fixedCircle,

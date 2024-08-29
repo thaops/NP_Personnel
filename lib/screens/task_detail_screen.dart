@@ -58,13 +58,13 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
 
   void _updateStatus(String newStatus) {
     setState(() {
-      _status = newStatus;
+      _status = newStatus.toLowerCase();
     });
   }
 
   void _updatePriority(String newPriority) {
     setState(() {
-      _priority = newPriority;
+      _priority = newPriority.toLowerCase();
     });
   }
 
@@ -78,8 +78,8 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
       'note': _controllerNote.text,
       'startDate': _startDate.toIso8601String(),
       'dueDate': _dueDate.toIso8601String(),
-      // 'state': _status,
-      // 'priority': _priority,
+      'state': _status,
+      'priority': _priority,
     };
 
     print("Update Data: $updateData");
@@ -89,6 +89,8 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
 
     print("Response Status: ${response.statusCode}");
     print("Response Body: ${response.message}");
+    print("state : $_status");
+     print("priority : $_priority");
 
     if (response.statusCode == 200) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -110,7 +112,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Task Details',
+          'Task Update',
           style: Theme.of(context).textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.bold,
                 color: Colors.white,
@@ -154,10 +156,10 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
               const SizedBox(height: 16),
               TaskStatusPriorityRow(
                 label1: "Trạng Thái",
-                value1: _status,
+                value1: _status.toLowerCase(),
                 onStatusSelected: (status) => _updateStatus(status),
                 label2: "Độ ưu tiên",
-                value2: _priority,
+                value2: _priority.toLowerCase(),
                 onPrioritySelected: (priority) => _updatePriority(priority),
               ),
               const SizedBox(height: 16),

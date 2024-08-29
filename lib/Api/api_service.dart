@@ -82,36 +82,69 @@ class ApiService extends ChangeNotifier {
     }
   }
 
-Future<bool> deleteTask(String taskId, String accessToken) async {
-  final String url = '$_baseUrl/tasks/$taskId';
-  print("url : $url");
+  Future<bool> deleteTask(String taskId, String accessToken) async {
+    final String url = '$_baseUrl/tasks/$taskId';
+    print("url : $url");
 
-  try {
-    final response = await http.delete(
-      Uri.parse(url),
-      headers: {
-        'Authorization': 'Bearer $accessToken',
-        'Content-Type': 'application/json',
-      },
-    );
+    try {
+      final response = await http.delete(
+        Uri.parse(url),
+        headers: {
+          'Authorization': 'Bearer $accessToken',
+          'Content-Type': 'application/json',
+        },
+      );
 
-    if (response.statusCode == 200) {
-      print('Task deleted successfully');
-      return true;
-    } else {
-      print('Failed to delete task');
+      if (response.statusCode == 200) {
+        print('Task deleted successfully');
+        return true;
+      } else {
+        print('Failed to delete task');
+        return false;
+      }
+    } catch (e) {
+      print('Error: $e');
       return false;
     }
-  } catch (e) {
-    print('Error: $e');
-    return false;
   }
-}
 
+  Future<taskResponse> addTask(
+      String accessToken, Map<String, dynamic> addData) async {
+    final String url = '$_baseUrl/tasks';
+    print("url : $url");
+    try {
+      final response = await http.post(
+        Uri.parse(url),
+        headers: {
+          'Authorization': 'Bearer $accessToken',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode(addData),
+      );
 
+      print("Response Status: ${response.statusCode}");
+      print("Response Body api: ${response.body}");
 
-  
-
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = jsonDecode(response.body);
+        return taskResponse.fromJson(data);
+      } else {
+        return taskResponse(
+          statusCode: response.statusCode,
+          message: 'Request failed with status: ${response.statusCode}',
+          totalRecord: 0,
+          data: '',
+        );
+      }
+    } catch (e) {
+      return taskResponse(
+        statusCode: 500,
+        message: 'An error occurred: $e',
+        totalRecord: 0,
+        data: '',
+      );
+    }
+  }
 
   Future<ApiResponse> sendTokenToApi(String token) async {
     final response = await http.post(
@@ -123,6 +156,7 @@ Future<bool> deleteTask(String taskId, String accessToken) async {
     );
 
     if (response.statusCode == 200) {
+      print("ApiResponse ${ApiResponse.fromJson(json.decode(response.body))}");
       return ApiResponse.fromJson(json.decode(response.body));
     } else {
       return ApiResponse(
@@ -137,7 +171,7 @@ Future<bool> deleteTask(String taskId, String accessToken) async {
   Future<List<Task>> fetchTasks(
       String accessToken, DateTime startDate, DateTime endDate) async {
     final url = Uri.parse(
-      '$_baseUrl/tasks?project=09764aab-bfe7-4602-b416-0a9057ceda5d&page=1&pageSize=50&StartDate=${startDate.toIso8601String()}&EndDate=${endDate.toIso8601String()}&ForMe=false',
+      '$_baseUrl/tasks?project=09764aab-bfe7-4602-b416-0a9057ceda5d&page=1&pageSize=50&StartDate=${startDate.toIso8601String()}&EndDate=${endDate.toIso8601String()}&ForMe=true',
     );
 
     final response = await http.get(

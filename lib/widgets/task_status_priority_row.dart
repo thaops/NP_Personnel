@@ -60,7 +60,7 @@ class TaskStatusPriorityRow extends StatelessWidget {
                     if (label == "Trạng Thái") {
                       options = [
                         PopupMenuItem<String>(
-                          value: 'Backlog',
+                          value: 'backlog',
                           child: Row(
                             children: [
                               Icon(Icons.hourglass_empty, color: Colors.orange),
@@ -70,7 +70,7 @@ class TaskStatusPriorityRow extends StatelessWidget {
                           ),
                         ),
                         PopupMenuItem<String>(
-                          value: 'In Progress',
+                          value: 'in-progress',
                           child: Row(
                             children: [
                               Icon(Icons.hourglass_top, color: Colors.blue),
@@ -80,7 +80,7 @@ class TaskStatusPriorityRow extends StatelessWidget {
                           ),
                         ),
                         PopupMenuItem<String>(
-                          value: 'Pending',
+                          value: 'pending',
                           child: Row(
                             children: [
                               Icon(Icons.pending, color: Colors.red),
@@ -90,7 +90,7 @@ class TaskStatusPriorityRow extends StatelessWidget {
                           ),
                         ),
                         PopupMenuItem<String>(
-                          value: 'Done',
+                          value: 'done',
                           child: Row(
                             children: [
                               Icon(Icons.check_circle, color: Colors.green),
@@ -103,7 +103,7 @@ class TaskStatusPriorityRow extends StatelessWidget {
                     } else {
                       options = [
                         PopupMenuItem<String>(
-                          value: 'High',
+                          value: 'high',
                           child: Row(
                             children: [
                               Icon(Icons.priority_high, color: Colors.red),
@@ -113,7 +113,7 @@ class TaskStatusPriorityRow extends StatelessWidget {
                           ),
                         ),
                         PopupMenuItem<String>(
-                          value: 'Medium',
+                          value: 'medium',
                           child: Row(
                             children: [
                               Icon(Icons.arrow_drop_down, color: Colors.orange),
@@ -123,7 +123,7 @@ class TaskStatusPriorityRow extends StatelessWidget {
                           ),
                         ),
                         PopupMenuItem<String>(
-                          value: 'Low',
+                          value: 'low',
                           child: Row(
                             children: [
                               Icon(Icons.arrow_drop_down, color: Colors.green),

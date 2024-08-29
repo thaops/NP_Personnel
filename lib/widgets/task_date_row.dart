@@ -88,7 +88,7 @@ class TaskDateRow extends StatelessWidget {
   }
 
   String _formatDate(DateTime dateTime) {
-    return DateFormat('dd/MM/yyyy').format(dateTime);
+    return DateFormat('yyyy-MM-dd').format(dateTime);
   }
 
   String _formatTime(DateTime dateTime) {

@@ -90,7 +90,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void _updateTaskList(bool update) {
     if (update) {
-      _fetchTasks(); 
+      _fetchTasks();
     }
   }
 
@@ -119,8 +119,8 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Center(
           child: Column(
             children: [
-              _buidlSearch(),
-              SizedBox(height: 16),
+              // _buidlSearch(),
+              // SizedBox(height: 16),
               _buildTable(),
               SizedBox(height: 20),
               Divider(),
@@ -214,7 +214,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
       availableGestures: AvailableGestures.all,
-      rowHeight: 55,
+      rowHeight: 60,
       selectedDayPredicate: (day) {
         return isSameDay(day, _startDate) || isSameDay(day, _endDate);
       },
