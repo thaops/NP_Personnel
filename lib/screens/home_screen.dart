@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hocflutter/Api/api_service.dart';
+import 'package:hocflutter/Api/models/ProjectRes.dart';
 import 'package:hocflutter/Api/models/task.dart';
 import 'package:hocflutter/config/constants/colors.dart';
 import 'package:hocflutter/screens/bottomSheet/task_bottomsheet.dart';
@@ -8,6 +9,8 @@ import 'package:hocflutter/screens/bottomSheet/task_bottomsheet.dart';
 import 'package:hocflutter/screens/login_screen.dart';
 import 'package:hocflutter/screens/task_detail_screen.dart';
 import 'package:hocflutter/services/lib/services/auth_service.dart';
+import 'package:hocflutter/widgets/home/custom_switch.dart';
+import 'package:hocflutter/widgets/menu/project_dropdown.dart';
 import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
 
@@ -27,12 +30,17 @@ class _HomeScreenState extends State<HomeScreen> {
 
   List<DateTime> selectedDays = [];
   List<Task>? tasks;
+  List<Project>? projectList;
+  String? project;
+
+  bool _isSwitched = false;
 
   final DateFormat dateFormat = DateFormat('yyyy-MM-dd HH:mm:ss.SSS');
   final DateFormat dateFormatD = DateFormat('yyyy-MM-dd');
   void _checkAndFetchTasks() {
     if (_startDate != null && _endDate != null) {
       _fetchTasks();
+      print("projectList $projectList");
     } else {
       setState(() {
         tasks = null;
@@ -42,12 +50,13 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> _fetchTasks() async {
     print('Fetching tasks...');
+
     try {
       if (widget.accessToken.isNotEmpty &&
           _startDate != null &&
           _endDate != null) {
         tasks = await _apiService.fetchTasks(
-            widget.accessToken, _startDate!, _endDate!);
+            widget.accessToken, _startDate!, _endDate!, project!, _isSwitched);
         setState(() {});
       } else {
         print('Access token, start date, or end date is missing.');
@@ -102,6 +111,31 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    _fetchProject();
+  }
+
+  Future<void> _fetchProject() async {
+    try {
+      if (widget.accessToken.isNotEmpty) {
+        final response = await _apiService.getProject(widget.accessToken);
+        if (response != null) {
+          setState(() {
+            projectList = response;
+          });
+        } else {
+          print('No project data found.');
+        }
+      } else {
+        print('Access token is missing.');
+      }
+    } catch (e) {
+      print('Error fetching projects: $e');
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
@@ -121,6 +155,27 @@ class _HomeScreenState extends State<HomeScreen> {
             children: [
               // _buidlSearch(),
               // SizedBox(height: 16),
+              CustomSwitch(
+                value: _isSwitched,
+                onChanged: (value) {
+                  setState(() {
+                    _isSwitched = value;
+                  });
+                  _fetchTasks();
+                },
+              ),
+              SizedBox(height: 16),
+              ProjectDropdown(
+                projectList: projectList,
+                onProjectSelected: (selectedProject) {
+                  setState(() {
+                    project = selectedProject?.id;
+                  });
+                  _fetchTasks();
+                },
+              ),
+
+              SizedBox(height: 16),
               _buildTable(),
               SizedBox(height: 20),
               Divider(),

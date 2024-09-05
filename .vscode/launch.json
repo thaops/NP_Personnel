@@ -5,22 +5,31 @@
     "version": "0.2.0",
     "configurations": [
         
+
+        
         {
             "name": "NP_Personnel",
             "request": "launch",
-            "type": "dart"
+            "type": "dart",
+            "program": "lib/main.dart",    // Đường dẫn file chính của bạn
+            "flutterMode": "debug",        // Chế độ debug (mặc định)
+            "deviceId": "e969c9da"         // ID của thiết bị Redmi K30 5G (nếu muốn)
         },
         {
             "name": "NP_Personnel (profile mode)",
             "request": "launch",
             "type": "dart",
-            "flutterMode": "profile"
+            "program": "lib/main.dart",    // Đường dẫn file chính của bạn
+            "flutterMode": "profile",      // Chế độ profile
+            "deviceId": "e969c9da" 
         },
         {
             "name": "NP_Personnel (release mode)",
             "request": "launch",
             "type": "dart",
-            "flutterMode": "release"
+            "program": "lib/main.dart",    // Đường dẫn file chính của bạn
+            "flutterMode": "release",      // Chế độ release
+            "deviceId": "e969c9da"  
         }
     ]
 }

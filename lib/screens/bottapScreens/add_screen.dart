@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:hocflutter/Api/api_service.dart';
+import 'package:hocflutter/Api/models/ProjectRes.dart';
+import 'package:hocflutter/Api/models/Users.dart';
 import 'package:hocflutter/config/constants/colors.dart';
 import 'package:hocflutter/config/router/router.dart';
+import 'package:hocflutter/styles/gogbal_styles.dart';
+import 'package:hocflutter/widgets/menu/project_dropdown.dart';
 import 'package:hocflutter/widgets/task_date_row.dart';
 import 'package:hocflutter/widgets/task_info_row.dart';
 import 'package:hocflutter/widgets/task_note_section.dart';
@@ -19,13 +23,17 @@ class AddScreen extends StatefulWidget {
 }
 
 class _AddScreenState extends State<AddScreen> {
-  ApiService apiService = ApiService();
+  final ApiService _apiService = ApiService();
   late TextEditingController _controller;
   late TextEditingController _controllerNote;
   late DateTime _startDate;
   late DateTime _dueDate;
   late String _status;
   late String _priority;
+  List<User>? users;
+  String? usersID;
+  List<Project>? projectList;
+  String? project;
   final DateFormat dateFormat = DateFormat('yyyy-MM-dd HH:mm');
 
   @override
@@ -37,6 +45,51 @@ class _AddScreenState extends State<AddScreen> {
     _dueDate = DateTime.now().add(Duration(days: 1));
     _status = 'backlog';
     _priority = 'low';
+    fetchUsers();
+    _fetchProject();
+  }
+
+  Future<void> _fetchProject() async {
+    final apiService = Provider.of<ApiService>(context, listen: false);
+    final accessToken = apiService.accessTokenId;
+    try {
+      if (accessToken.isNotEmpty) {
+        final response = await _apiService.getProject(accessToken);
+        if (response != null) {
+          setState(() {
+            projectList = response;
+          });
+        } else {
+          print('No project data found.');
+        }
+      } else {
+        print('Access token is missing.');
+      }
+    } catch (e) {
+      print('Error fetching projects: $e');
+    }
+  }
+
+  Future<void> fetchUsers() async {
+    final apiService = Provider.of<ApiService>(context, listen: false);
+    final accessToken = apiService.accessTokenId;
+
+    try {
+      if (accessToken.isNotEmpty) {
+        final response = await _apiService.getUsers(accessToken);
+        if (response != null) {
+          setState(() {
+            users = response;
+          });
+        } else {
+          print('No user data found.');
+        }
+      } else {
+        print('Access token is missing.');
+      }
+    } catch (e) {
+      print('Error fetching users: $e');
+    }
   }
 
   void _updateStatus(String newStatus) {
@@ -61,46 +114,42 @@ class _AddScreenState extends State<AddScreen> {
     });
   }
 
-void _saveTask() async {
-  final apiService = Provider.of<ApiService>(context, listen: false);
-  final accessToken = apiService.accessTokenId;
+  void _saveTask() async {
+    final apiService = Provider.of<ApiService>(context, listen: false);
+    final accessToken = apiService.accessTokenId;
 
-  Map<String, dynamic> addData = {
-    'title': _controller.text,
-    'note': _controllerNote.text,
-    'startDate': _startDate.toIso8601String(),
-    'dueDate': _dueDate.toIso8601String(),
-    'state': _status ,
-    'priority': _priority,
-    'projectId': '09764aab-bfe7-4602-b416-0a9057ceda5d', 
-    'sprintId': 'd142acbc-bbe0-4963-82de-1d4f13319953', 
-    'parentTaskId': null,
-    'assigneeId': '14cc6fd9-797e-4190-ac27-bd927d7b4858' 
-  };
+    Map<String, dynamic> addData = {
+      'title': _controller.text,
+      'note': _controllerNote.text,
+      'startDate': _startDate.toIso8601String(),
+      'dueDate': _dueDate.toIso8601String(),
+      'state': _status,
+      'priority': _priority,
+      'projectId': project,
+      'sprintId': 'd142acbc-bbe0-4963-82de-1d4f13319953',
+      'parentTaskId': null,
+      'assigneeId': usersID
+    };
 
-  print("add Data: $addData");
+    final response = await apiService.addTask(accessToken, addData);
 
-  final response = await apiService.addTask(accessToken, addData);
-
-  print("Response Status: ${response.statusCode}");
-  print("Response Body: ${response.message}");
-  print("state : $_status");
-  print("priority : $_priority");
-
-  if (response.statusCode == 200) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Tạo  Task Thành công')),
-    );
-  } else {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Tạo Task Thất bại: ${response.message}')),
-    );
+    if (response.statusCode == 200) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Tạo  Task Thành công')),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Tạo Task Thất bại: ${response.message}')),
+      );
+    }
   }
-}
-
 
   @override
   Widget build(BuildContext context) {
+    final apiService = Provider.of<ApiService>(context, listen: false);
+    final accessToken = apiService.accessTokenId;
+
+    print("users $users");
     final screenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
       appBar: AppBar(
@@ -142,9 +191,28 @@ void _saveTask() async {
                 controller: _controller,
               ),
               const SizedBox(height: 24),
+              Text(
+                "Project",
+                style: GogbalStyles.heading2,
+              ),
+              SizedBox(height: 10),
+              ProjectDropdown(
+                projectList: projectList,
+                onProjectSelected: (selectedProject) {
+                  setState(() {
+                    project = selectedProject?.id;
+                  });
+                },
+              ),
+              SizedBox(height: 16),
               TaskInfoRow(
                 label1: "Nhân Viên",
-                value1: 'Phạm Đồng Thảo',
+                usersList: users,
+                onProjectSelected: (selectedUser) {
+                  setState(() {
+                    usersID = selectedUser?.id;
+                  });
+                },
               ),
               const SizedBox(height: 16),
               TaskStatusPriorityRow(

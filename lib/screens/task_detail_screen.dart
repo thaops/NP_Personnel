@@ -86,12 +86,6 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
 
     final response =
         await apiService.updateTask(taskId, accessToken, updateData);
-
-    print("Response Status: ${response.statusCode}");
-    print("Response Body: ${response.message}");
-    print("state : $_status");
-     print("priority : $_priority");
-
     if (response.statusCode == 200) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Cập nhật Task Thành công')),
@@ -151,7 +145,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
               const SizedBox(height: 24),
               TaskInfoRow(
                 label1: "Nhân Viên",
-                value1: widget.task.creator,
+                
               ),
               const SizedBox(height: 16),
               TaskStatusPriorityRow(

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hocflutter/Api/models/ApiResponse.dart';
+import 'package:hocflutter/Api/models/ProjectRes.dart';
+import 'package:hocflutter/Api/models/Users.dart';
 import 'package:hocflutter/Api/models/task.dart';
 import 'package:hocflutter/Api/models/taskResponse.dart';
 import 'package:http/http.dart' as http;
@@ -168,10 +170,10 @@ class ApiService extends ChangeNotifier {
     }
   }
 
-  Future<List<Task>> fetchTasks(
-      String accessToken, DateTime startDate, DateTime endDate) async {
+  Future<List<Task>> fetchTasks(String accessToken, DateTime startDate,
+      DateTime endDate, String project, bool _isSwitched) async {
     final url = Uri.parse(
-      '$_baseUrl/tasks?project=09764aab-bfe7-4602-b416-0a9057ceda5d&page=1&pageSize=50&StartDate=${startDate.toIso8601String()}&EndDate=${endDate.toIso8601String()}&ForMe=true',
+      '$_baseUrl/tasks?project=$project&page=1&pageSize=50&StartDate=${startDate.toIso8601String()}&EndDate=${endDate.toIso8601String()}&ForMe=$_isSwitched',
     );
 
     final response = await http.get(
@@ -195,6 +197,64 @@ class ApiService extends ChangeNotifier {
       print('Failed to load tasks: ${response.statusCode}');
       print('Response body: ${response.body}');
       throw Exception('Failed to load tasks');
+    }
+  }
+
+  Future<List<Project>?> getProject(String accessToken) async {
+    final String url = '$_baseUrl/projects?page=1&pageSize=9999';
+    print("response: $url");
+    try {
+      final response = await http.get(
+        Uri.parse(url),
+        headers: {
+          'Authorization': 'Bearer $accessToken',
+          'Content-Type': 'application/json',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> jsonResponse = json.decode(response.body);
+        final List<dynamic> projectsJson = jsonResponse['data'];
+        List<Project> projects = projectsJson
+            .map((projectJson) => Project.fromJson(projectJson))
+            .toList();
+        return projects;
+      } else {
+        print('Failed to load task');
+        return null;
+      }
+    } catch (e) {
+      print('Error: $e');
+      return null;
+    }
+  }
+
+  Future<List<User>?> getUsers(String accessToken) async {
+    final String url = '$_baseUrl/users?page=1&pageSize=9999';
+    print("Request URL: $url");
+    try {
+      final response = await http.get(
+        Uri.parse(url),
+        headers: {
+          'Authorization': 'Bearer $accessToken',
+          'Content-Type': 'application/json',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> jsonResponse = json.decode(response.body);
+        final List<dynamic> usersJson = jsonResponse['data'];
+         print("jsonResponse $usersJson");
+        List<User> users =
+            usersJson.map((userJson) => User.fromJson(userJson)).toList();
+        return users;
+      } else {
+        print('Failed to load users');
+        return null;
+      }
+    } catch (e) {
+      print('Error: $e');
+      return null;
     }
   }
 }
