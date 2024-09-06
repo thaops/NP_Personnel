@@ -15,6 +15,12 @@ class GogbalStyles {
     color: Colors.black87,
   );
 
+    static const TextStyle heading3 = TextStyle(
+    fontSize: 18.0,
+    fontWeight: FontWeight.w600,
+    color: Colors.black87,
+  );
+
   // Kiểu chữ nội dung chính
   static const TextStyle bodyText1 = TextStyle(
     fontSize: 16.0,

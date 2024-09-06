@@ -15,6 +15,28 @@ class _ProjectDropdownState extends State<ProjectDropdown> {
   Project? _selectedProject;
 
   @override
+  void initState() {
+    super.initState();
+    if (widget.projectList != null && widget.projectList!.isNotEmpty) {
+      _selectedProject = widget.projectList!.first;
+      // Gọi onProjectSelected với item đầu tiên nếu có
+      if (widget.onProjectSelected != null) {
+        widget.onProjectSelected!(_selectedProject);
+      }
+    }
+  }
+
+  @override
+  void didUpdateWidget(covariant ProjectDropdown oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.projectList != null &&
+        widget.projectList != oldWidget.projectList &&
+        widget.projectList!.isNotEmpty) {
+      _selectedProject = widget.projectList!.first;
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
 
@@ -36,7 +58,6 @@ class _ProjectDropdownState extends State<ProjectDropdown> {
             borderRadius: BorderRadius.circular(12),
             borderSide: BorderSide(color: Colors.grey.shade300),
           ),
-          hintText: 'Select a Project',
         ),
         isExpanded: true,
         value: _selectedProject,
@@ -52,7 +73,7 @@ class _ProjectDropdownState extends State<ProjectDropdown> {
           return DropdownMenuItem<Project>(
             value: project,
             child: Text(
-              project.name,
+              project.name, // Hiển thị tên dự án
               style: TextStyle(color: Colors.black87),
             ),
           );

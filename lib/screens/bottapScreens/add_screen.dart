@@ -2,10 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:hocflutter/Api/api_service.dart';
 import 'package:hocflutter/Api/models/ProjectRes.dart';
 import 'package:hocflutter/Api/models/Users.dart';
+import 'package:hocflutter/Api/models/sprint_model.dart';
 import 'package:hocflutter/config/constants/colors.dart';
 import 'package:hocflutter/config/router/router.dart';
 import 'package:hocflutter/styles/gogbal_styles.dart';
+import 'package:hocflutter/widgets/home/custom_switch.dart';
 import 'package:hocflutter/widgets/menu/project_dropdown.dart';
+import 'package:hocflutter/widgets/menu/task_sprint_row.dart';
 import 'package:hocflutter/widgets/task_date_row.dart';
 import 'package:hocflutter/widgets/task_info_row.dart';
 import 'package:hocflutter/widgets/task_note_section.dart';
@@ -34,6 +37,9 @@ class _AddScreenState extends State<AddScreen> {
   String? usersID;
   List<Project>? projectList;
   String? project;
+  List<Sprint>? sprints;
+  String? sprintID;
+  bool _isWbs = false;
   final DateFormat dateFormat = DateFormat('yyyy-MM-dd HH:mm');
 
   @override
@@ -46,7 +52,9 @@ class _AddScreenState extends State<AddScreen> {
     _status = 'backlog';
     _priority = 'low';
     fetchUsers();
+
     _fetchProject();
+    fetchSprint();
   }
 
   Future<void> _fetchProject() async {
@@ -70,13 +78,38 @@ class _AddScreenState extends State<AddScreen> {
     }
   }
 
+  Future<void> fetchSprint() async {
+    final apiService = Provider.of<ApiService>(context, listen: false);
+    final accessToken = apiService.accessTokenId;
+
+    try {
+      if (accessToken.isNotEmpty) {
+        final response = await _apiService.getSprint(
+            accessToken, project ?? '09764aab-bfe7-4602-b416-0a9057ceda5d');
+        if (response != null) {
+          setState(() {
+            sprints = response;
+          });
+        } else {
+          print('No user data found.');
+        }
+      } else {
+        print('Access token is missing.');
+      }
+    } catch (e) {
+      print('Error fetching users: $e');
+    }
+  }
+
   Future<void> fetchUsers() async {
     final apiService = Provider.of<ApiService>(context, listen: false);
     final accessToken = apiService.accessTokenId;
 
     try {
       if (accessToken.isNotEmpty) {
-        final response = await _apiService.getUsers(accessToken);
+        final response = await _apiService.getUsers(
+          accessToken,
+        );
         if (response != null) {
           setState(() {
             users = response;
@@ -126,9 +159,10 @@ class _AddScreenState extends State<AddScreen> {
       'state': _status,
       'priority': _priority,
       'projectId': project,
-      'sprintId': 'd142acbc-bbe0-4963-82de-1d4f13319953',
+      'sprintId': sprintID,
       'parentTaskId': null,
-      'assigneeId': usersID
+      'assigneeId': usersID,
+      "wbs": _isWbs
     };
 
     final response = await apiService.addTask(accessToken, addData);
@@ -146,10 +180,11 @@ class _AddScreenState extends State<AddScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // if (project != null) {
+    //   fetchSprint();
+    // }
     final apiService = Provider.of<ApiService>(context, listen: false);
     final accessToken = apiService.accessTokenId;
-
-    print("users $users");
     final screenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
       appBar: AppBar(
@@ -193,9 +228,9 @@ class _AddScreenState extends State<AddScreen> {
               const SizedBox(height: 24),
               Text(
                 "Project",
-                style: GogbalStyles.heading2,
+                style: GogbalStyles.heading3,
               ),
-              SizedBox(height: 10),
+              SizedBox(height: 8),
               ProjectDropdown(
                 projectList: projectList,
                 onProjectSelected: (selectedProject) {
@@ -203,6 +238,41 @@ class _AddScreenState extends State<AddScreen> {
                     project = selectedProject?.id;
                   });
                 },
+              ),
+              SizedBox(height: 16),
+              TaskSprintRow(
+                label1: "Sprint",
+                sprintsList: sprints,
+                onProjectSelected: (selectedSprint) {
+                  setState(() {
+                    sprintID = selectedSprint?.id;
+                  });
+                },
+              ),
+              SizedBox(height: 16),
+              Padding(
+                padding: const EdgeInsets.only(left: 6),
+                child: Row(
+                  children: [
+                    Container(
+                        width: 50,
+                        child: Text(
+                          _isWbs ? "WBS" : "Task",
+                          style: GogbalStyles.heading3,
+                        )),
+                    SizedBox(
+                      width: 10,
+                    ),
+                    CustomSwitch(
+                      value: _isWbs,
+                      onChanged: (value) {
+                        setState(() {
+                          _isWbs = value;
+                        });
+                      },
+                    ),
+                  ],
+                ),
               ),
               SizedBox(height: 16),
               TaskInfoRow(
@@ -245,14 +315,13 @@ class _AddScreenState extends State<AddScreen> {
                   icon: Icon(Icons.save),
                   label: Text('Lưu'),
                   style: ElevatedButton.styleFrom(
-                    minimumSize:
-                        Size(screenWidth, 48), // Độ rộng và chiều cao của nút
-                    backgroundColor: dark_blue, // Màu nền của nút
+                    minimumSize: Size(screenWidth, 48),
+                    backgroundColor: dark_blue,
                     foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12.0), // Bo tròn góc
+                      borderRadius: BorderRadius.circular(12.0),
                     ),
-                    elevation: 4, // Độ nổi của nút
+                    elevation: 4,
                   ),
                 ),
               ),

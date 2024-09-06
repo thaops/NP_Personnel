@@ -9,6 +9,7 @@ import 'package:hocflutter/screens/bottomSheet/task_bottomsheet.dart';
 import 'package:hocflutter/screens/login_screen.dart';
 import 'package:hocflutter/screens/task_detail_screen.dart';
 import 'package:hocflutter/services/lib/services/auth_service.dart';
+import 'package:hocflutter/styles/gogbal_styles.dart';
 import 'package:hocflutter/widgets/home/custom_switch.dart';
 import 'package:hocflutter/widgets/menu/project_dropdown.dart';
 import 'package:intl/intl.dart';
@@ -155,15 +156,26 @@ class _HomeScreenState extends State<HomeScreen> {
             children: [
               // _buidlSearch(),
               // SizedBox(height: 16),
-              CustomSwitch(
-                value: _isSwitched,
-                onChanged: (value) {
-                  setState(() {
-                    _isSwitched = value;
-                  });
-                  _fetchTasks();
-                },
+              Padding(
+                padding: const EdgeInsets.only(left: 6),
+                child: Row(
+                  children: [
+                    Container(width: 100,
+                      child: Text(_isSwitched ?"Cá nhân" : "Mọi Người", style: GogbalStyles.heading3,)),
+                    SizedBox(width: 10,),
+                    CustomSwitch(
+                      value: _isSwitched,
+                      onChanged: (value) {
+                        setState(() {
+                          _isSwitched = value;
+                        });
+                        _fetchTasks();
+                      },
+                    ),
+                  ],
+                ),
               ),
+
               SizedBox(height: 16),
               ProjectDropdown(
                 projectList: projectList,

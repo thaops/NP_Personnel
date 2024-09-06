@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hocflutter/Api/models/ApiResponse.dart';
 import 'package:hocflutter/Api/models/ProjectRes.dart';
 import 'package:hocflutter/Api/models/Users.dart';
+import 'package:hocflutter/Api/models/sprint_model.dart';
 import 'package:hocflutter/Api/models/task.dart';
 import 'package:hocflutter/Api/models/taskResponse.dart';
 import 'package:http/http.dart' as http;
@@ -257,4 +258,36 @@ class ApiService extends ChangeNotifier {
       return null;
     }
   }
+
+
+  Future<List<Sprint>?> getSprint(String accessToken,String project) async {
+    final String url = '$_baseUrl/sprints?project=$project&page=1&pageSize=9999&startDate=2023-12-04&endDate=2222-12-31';
+    print("Request URL strubg: $url");
+    try {
+      final response = await http.get(
+        Uri.parse(url),
+        headers: {
+          'Authorization': 'Bearer $accessToken',
+          'Content-Type': 'application/json',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> jsonResponse = json.decode(response.body);
+        final List<dynamic> sprintsJson = jsonResponse['data'];
+        List<Sprint> sprints =
+            sprintsJson.map((sprintJson) => Sprint.fromJson(sprintJson)).toList();
+        return sprints;
+      } else {
+        print('Failed to load users');
+        return null;
+      }
+    } catch (e) {
+      print('Error: $e');
+      return null;
+    }
+  }
+
+
+
 }
