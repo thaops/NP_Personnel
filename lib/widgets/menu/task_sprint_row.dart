@@ -29,58 +29,66 @@ class _TaskSprintRowState extends State<TaskSprintRow> {
       _selectedSprint = null;
     }
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          '${widget.label1}:',
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.w600,
-                color: Theme.of(context).colorScheme.onBackground,
-              ),
-        ),
-        Container(
-          width: screenWidth * 0.5,
-          child: DropdownButtonFormField<Sprint>(
-            decoration: InputDecoration(
-              contentPadding:
-                  EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: Colors.grey.shade300),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: Colors.blue),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: Colors.grey.shade300),
-              ),
-              hintText: 'Select a Sprint',
+    return Center(
+      child: Container(
+        width: screenWidth ,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              '${widget.label1}:',
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: Theme.of(context).colorScheme.onBackground,
+                  ),
             ),
-            isExpanded: true,
-            value: _selectedSprint,
-            onChanged: (Sprint? newValue) {
-              setState(() {
-                _selectedSprint = newValue;
-                if (widget.onProjectSelected != null) {
-                  widget.onProjectSelected!(newValue);
-                }
-              });
-            },
-            items: sprints.map((Sprint sprint) {
-              return DropdownMenuItem<Sprint>(
-                value: sprint,
-                child: Text(
-                  sprint.title,
-                  style: TextStyle(color: Colors.black87),
+            SizedBox(height: 10,),
+            Container(
+              width: screenWidth ,
+               decoration: BoxDecoration(
+            color: Colors.white, borderRadius: BorderRadius.circular(12)),
+              child: DropdownButtonFormField<Sprint>(
+                decoration: InputDecoration(
+                  contentPadding:
+                      EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: Colors.grey.shade300),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: Colors.blue),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: Colors.grey.shade300),
+                  ),
+                  hintText: 'Select a Sprint',
                 ),
-              );
-            }).toList(),
-          ),
+                isExpanded: true,
+                value: _selectedSprint,
+                onChanged: (Sprint? newValue) {
+                  setState(() {
+                    _selectedSprint = newValue;
+                    if (widget.onProjectSelected != null) {
+                      widget.onProjectSelected!(newValue);
+                    }
+                  });
+                },
+                items: sprints.map((Sprint sprint) {
+                  return DropdownMenuItem<Sprint>(
+                    value: sprint,
+                    child: Text(
+                      sprint.title,
+                      style: TextStyle(color: Colors.black87),
+                    ),
+                  );
+                }).toList(),
+              ),
+            ),
+          ],
         ),
-      ],
+      ),
     );
   }
 }

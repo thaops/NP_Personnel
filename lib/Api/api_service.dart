@@ -11,6 +11,13 @@ import 'dart:convert';
 class ApiService extends ChangeNotifier {
   final String _baseUrl = 'https://napro-api.azurewebsites.net/api';
 
+  String? _projectId;
+  String? get projectId => _projectId;
+  void setProjectId(project) {
+    _projectId = project;
+    notifyListeners();
+  }
+
   String _accessTokenId = '';
   String get accessTokenId => _accessTokenId;
   void setAccessTokenId(String token) {
@@ -230,7 +237,7 @@ class ApiService extends ChangeNotifier {
     }
   }
 
-  Future<List<User>?> getUsers(String accessToken) async {
+  Future<List<UserModel>?> getUsers(String accessToken) async {
     final String url = '$_baseUrl/users?page=1&pageSize=9999';
     print("Request URL: $url");
     try {
@@ -245,9 +252,9 @@ class ApiService extends ChangeNotifier {
       if (response.statusCode == 200) {
         final Map<String, dynamic> jsonResponse = json.decode(response.body);
         final List<dynamic> usersJson = jsonResponse['data'];
-         print("jsonResponse $usersJson");
-        List<User> users =
-            usersJson.map((userJson) => User.fromJson(userJson)).toList();
+        print("jsonResponse $usersJson");
+        List<UserModel> users =
+            usersJson.map((userJson) => UserModel.fromJson(userJson)).toList();
         return users;
       } else {
         print('Failed to load users');
@@ -259,9 +266,9 @@ class ApiService extends ChangeNotifier {
     }
   }
 
-
-  Future<List<Sprint>?> getSprint(String accessToken,String project) async {
-    final String url = '$_baseUrl/sprints?project=$project&page=1&pageSize=9999&startDate=2023-12-04&endDate=2222-12-31';
+  Future<List<Sprint>?> getSprint(String accessToken, String project) async {
+    final String url =
+        '$_baseUrl/sprints?project=$project&page=1&pageSize=9999&startDate=2023-12-04&endDate=2222-12-31';
     print("Request URL strubg: $url");
     try {
       final response = await http.get(
@@ -275,8 +282,10 @@ class ApiService extends ChangeNotifier {
       if (response.statusCode == 200) {
         final Map<String, dynamic> jsonResponse = json.decode(response.body);
         final List<dynamic> sprintsJson = jsonResponse['data'];
-        List<Sprint> sprints =
-            sprintsJson.map((sprintJson) => Sprint.fromJson(sprintJson)).toList();
+        List<Sprint> sprints = sprintsJson
+            .map((sprintJson) => Sprint.fromJson(sprintJson))
+            .toList();
+            print("Request URL strubg: $sprints");
         return sprints;
       } else {
         print('Failed to load users');
@@ -287,7 +296,4 @@ class ApiService extends ChangeNotifier {
       return null;
     }
   }
-
-
-
 }

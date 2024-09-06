@@ -3,8 +3,8 @@ import 'package:hocflutter/Api/models/Users.dart';
 
 class TaskInfoRow extends StatefulWidget {
   final String label1;
-  final List<User>? usersList;
-  final void Function(User?)? onProjectSelected;
+  final List<UserModel>? usersList;
+  final void Function(UserModel?)? onProjectSelected;
 
   TaskInfoRow({
     Key? key,
@@ -18,64 +18,70 @@ class TaskInfoRow extends StatefulWidget {
 }
 
 class _TaskInfoRowState extends State<TaskInfoRow> {
-  User? _selectedUser;
+  UserModel? _selectedUser;
 
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          '${widget.label1}:',
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.w600,
-                color: Theme.of(context).colorScheme.onBackground,
-              ),
-        ),
-        Container(
-          width: screenWidth * 0.6,
-          child: DropdownButtonFormField<User>(
-            decoration: InputDecoration(
-              contentPadding:
-                  EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: Colors.grey.shade300),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: Colors.blue),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: Colors.grey.shade300),
-              ),
-              hintText: 'Select a Project',
-            ),
-            isExpanded: true,
-            value: _selectedUser,
-            onChanged: (User? newValue) {
-              setState(() {
-                _selectedUser = newValue;
-                if (widget.onProjectSelected != null) {
-                  widget.onProjectSelected!(newValue);
-                }
-              });
-            },
-            items: widget.usersList?.map((User user) {
-                  return DropdownMenuItem<User>(
-                    value: user,
-                    child: Text(
-                      user.fullName,
-                      style: TextStyle(color: Colors.black87),
-                    ),
-                  );
-                }).toList() ??
-                [],
+    return Container(
+      width: screenWidth ,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            '${widget.label1}:',
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: Theme.of(context).colorScheme.onBackground,
+                ),
           ),
-        ),
-      ],
+          SizedBox(height: 10,),
+          Container(
+            width: screenWidth ,
+             decoration: BoxDecoration(
+          color: Colors.white, borderRadius: BorderRadius.circular(12)),
+            child: DropdownButtonFormField<UserModel>(
+              decoration: InputDecoration(
+                contentPadding:
+                    EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: Colors.grey.shade300),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: Colors.blue),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: Colors.grey.shade300),
+                ),
+                hintText: 'Select a Project',
+              ),
+              isExpanded: true,
+              value: _selectedUser,
+              onChanged: (UserModel? newValue) {
+                setState(() {
+                  _selectedUser = newValue;
+                  if (widget.onProjectSelected != null) {
+                    widget.onProjectSelected!(newValue);
+                  }
+                });
+              },
+              items: widget.usersList?.map((UserModel user) {
+                    return DropdownMenuItem<UserModel>(
+                      value: user,
+                      child: Text(
+                        user.fullName,
+                        style: TextStyle(color: Colors.black87),
+                      ),
+                    );
+                  }).toList() ??
+                  [],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

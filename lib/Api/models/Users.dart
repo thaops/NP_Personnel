@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-class User {
+class UserModel {
   final String id;
   final String fullName;
   final String? avatarUrl;
@@ -17,7 +17,7 @@ class User {
   final DateTime? signedDate;
   final DateTime? expiredDate;
 
-  User({
+  UserModel({
     required this.id,
     required this.fullName,
     this.avatarUrl,
@@ -35,8 +35,8 @@ class User {
     this.expiredDate,
   });
 
-  factory User.fromJson(Map<String, dynamic> json) {
-    return User(
+  factory UserModel.fromJson(Map<String, dynamic> json) {
+    return UserModel(
       id: json['id'],
       fullName: json['fullName'],
       avatarUrl: json['avatarUrl'],
@@ -83,6 +83,6 @@ class User {
 
   @override
   String toString() {
-    return 'User(id: $id, fullName: $fullName, avatarUrl: $avatarUrl, department: $department, userType: $userType, userTypeLabel: $userTypeLabel, bankInfo: $bankInfo, email: $email, tel: $tel, startDate: $startDate, cccd: $cccd, licenseDate: $licenseDate, licensePlace: $licensePlace, signedDate: $signedDate, expiredDate: $expiredDate)';
+    return 'UserModel(id: $id, fullName: $fullName, avatarUrl: $avatarUrl, department: $department, userType: $userType, userTypeLabel: $userTypeLabel, bankInfo: $bankInfo, email: $email, tel: $tel, startDate: $startDate, cccd: $cccd, licenseDate: $licenseDate, licensePlace: $licensePlace, signedDate: $signedDate, expiredDate: $expiredDate)';
   }
 }

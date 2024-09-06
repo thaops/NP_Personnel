@@ -1,7 +1,13 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:hocflutter/Api/api_service.dart';
+import 'package:hocflutter/Api/models/Users.dart';
+import 'package:hocflutter/Api/models/sprint_model.dart';
 import 'package:hocflutter/Api/models/task.dart';
 import 'package:hocflutter/config/constants/colors.dart';
+import 'package:hocflutter/styles/gogbal_styles.dart';
+import 'package:hocflutter/widgets/home/custom_switch.dart';
+import 'package:hocflutter/widgets/menu/task_sprint_row.dart';
 import 'package:hocflutter/widgets/task_title_section.dart';
 import 'package:hocflutter/widgets/task_info_row.dart';
 import 'package:hocflutter/widgets/task_status_priority_row.dart';
@@ -27,6 +33,11 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
   late DateTime _dueDate;
   late String _status;
   late String _priority;
+  List<UserModel>? users;
+  String? usersID;
+  bool _isWbs = false;
+  List<Sprint>? sprints;
+  String? sprintID;
 
   @override
   void initState() {
@@ -37,6 +48,9 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
     _dueDate = widget.task.dueDate;
     _status = widget.task.state;
     _priority = widget.task.priority;
+    fetchUsers();
+    fetchSprint();
+     print("task : ${widget.task}");
   }
 
   @override
@@ -44,6 +58,30 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
     _controller.dispose();
     _controllerNote.dispose();
     super.dispose();
+  }
+
+  Future<void> fetchSprint() async {
+    final apiService = Provider.of<ApiService>(context, listen: false);
+    final accessToken = apiService.accessTokenId;
+    final projectId = apiService.projectId;
+    print("projectId: $projectId");
+    try {
+      if (accessToken.isNotEmpty) {
+        final response = await apiService.getSprint(
+            accessToken, projectId ?? '09764aab-bfe7-4602-b416-0a9057ceda5d');
+        if (response != null) {
+          setState(() {
+            sprints = response;
+          });
+        } else {
+          print('No user data found.');
+        }
+      } else {
+        print('Access token is missing.');
+      }
+    } catch (e) {
+      print('Error fetching users: $e');
+    }
   }
 
   void _updateDate(DateTime newDate, bool isStartDate) {
@@ -68,6 +106,30 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
     });
   }
 
+  Future<void> fetchUsers() async {
+    final apiService = Provider.of<ApiService>(context, listen: false);
+    final accessToken = apiService.accessTokenId;
+
+    try {
+      if (accessToken.isNotEmpty) {
+        final response = await apiService.getUsers(
+          accessToken,
+        );
+        if (response != null) {
+          setState(() {
+            users = response;
+          });
+        } else {
+          print('No user data found.');
+        }
+      } else {
+        print('Access token is missing.');
+      }
+    } catch (e) {
+      print('Error fetching users: $e');
+    }
+  }
+
   void _saveTask() async {
     final apiService = Provider.of<ApiService>(context, listen: false);
     final accessToken = apiService.accessTokenId;
@@ -78,8 +140,11 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
       'note': _controllerNote.text,
       'startDate': _startDate.toIso8601String(),
       'dueDate': _dueDate.toIso8601String(),
-      'state': _status,
-      'priority': _priority,
+      'state': _status.toLowerCase(),
+      'priority': _priority.toLowerCase(),
+      'assigneeId': usersID,
+      "wbs": _isWbs,
+      'sprintId': sprintID,
     };
 
     print("Update Data: $updateData");
@@ -101,7 +166,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
   @override
   Widget build(BuildContext context) {
     final taskId = widget.task.id;
-    print("taskId: $taskId");
+   
     final screenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
       appBar: AppBar(
@@ -119,6 +184,12 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
           borderRadius: BorderRadius.vertical(
             bottom: Radius.circular(16.0),
           ),
+        ),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () {
+            Navigator.pop(context);
+          },
         ),
         actions: [
           SizedBox(width: 16),
@@ -143,9 +214,49 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
                 controller: _controller,
               ),
               const SizedBox(height: 24),
+              TaskSprintRow(
+                label1: "Sprint",
+                sprintsList: sprints,
+                onProjectSelected: (selectedSprint) {
+                  setState(() {
+                    sprintID = selectedSprint?.id;
+                  });
+                },
+              ),
+              SizedBox(height: 16),
+              Padding(
+                padding: const EdgeInsets.only(left: 6),
+                child: Row(
+                  children: [
+                    Container(
+                        width: 50,
+                        child: Text(
+                          _isWbs ? "WBS" : "Task",
+                          style: GogbalStyles.heading3,
+                        )),
+                    SizedBox(
+                      width: 10,
+                    ),
+                    CustomSwitch(
+                      value: _isWbs,
+                      onChanged: (value) {
+                        setState(() {
+                          _isWbs = value;
+                        });
+                      },
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(height: 16),
               TaskInfoRow(
                 label1: "Nhân Viên",
-                
+                usersList: users,
+                onProjectSelected: (selectedUser) {
+                  setState(() {
+                    usersID = selectedUser?.id;
+                  });
+                },
               ),
               const SizedBox(height: 16),
               TaskStatusPriorityRow(

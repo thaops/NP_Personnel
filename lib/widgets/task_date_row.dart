@@ -49,10 +49,11 @@ class TaskDateRow extends StatelessWidget {
               child: Container(
                 height: 40,
                 decoration: BoxDecoration(
+                  color: Colors.white,
                   borderRadius: BorderRadius.circular(8.0),
                   border: Border.all(
                     width: 1.0,
-                    color: Theme.of(context).colorScheme.outline,
+                    color: Colors.grey.shade400,
                   ),
                 ),
                 child: Padding(

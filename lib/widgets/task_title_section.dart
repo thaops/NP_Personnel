@@ -24,20 +24,22 @@ class TaskTitleSection extends StatelessWidget {
               fontWeight: FontWeight.bold,
               color: Theme.of(context).colorScheme.onBackground),
         ),
+        SizedBox(height: 10,),
         GestureDetector(
           onTap: () {
             print('Tiêu đề công việc nhấp vào');
           },
           child: Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.all(0),
             child: Container(
               width: screenWidth,
-              height: 80,
+              height: 100,
               decoration: BoxDecoration(
+                color: Colors.white,
                 borderRadius: BorderRadius.circular(8.0),
                 border: Border.all(
                   width: 1.0,
-                  color: Theme.of(context).colorScheme.outline,
+                  color: Colors.grey.shade400
                 ),
               ),
               child: Padding(

@@ -41,4 +41,9 @@ class GogbalStyles {
     fontWeight: FontWeight.bold,
     color: Colors.white,
   );
+  static  BoxDecoration commonBoxDecoration = BoxDecoration(
+  color: Colors.white,
+  borderRadius: BorderRadius.circular(12),
+);
+
 }

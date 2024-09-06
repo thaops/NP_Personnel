@@ -33,7 +33,7 @@ class _AddScreenState extends State<AddScreen> {
   late DateTime _dueDate;
   late String _status;
   late String _priority;
-  List<User>? users;
+  List<UserModel>? users;
   String? usersID;
   List<Project>? projectList;
   String? project;
@@ -52,7 +52,6 @@ class _AddScreenState extends State<AddScreen> {
     _status = 'backlog';
     _priority = 'low';
     fetchUsers();
-
     _fetchProject();
     fetchSprint();
   }
@@ -180,9 +179,6 @@ class _AddScreenState extends State<AddScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // if (project != null) {
-    //   fetchSprint();
-    // }
     final apiService = Provider.of<ApiService>(context, listen: false);
     final accessToken = apiService.accessTokenId;
     final screenWidth = MediaQuery.of(context).size.width;
@@ -226,11 +222,11 @@ class _AddScreenState extends State<AddScreen> {
                 controller: _controller,
               ),
               const SizedBox(height: 24),
-              Text(
+              const Text(
                 "Project",
                 style: GogbalStyles.heading3,
               ),
-              SizedBox(height: 8),
+              const SizedBox(height: 8),
               ProjectDropdown(
                 projectList: projectList,
                 onProjectSelected: (selectedProject) {
@@ -325,6 +321,7 @@ class _AddScreenState extends State<AddScreen> {
                   ),
                 ),
               ),
+              const SizedBox(height: 16,),
             ],
           ),
         ),

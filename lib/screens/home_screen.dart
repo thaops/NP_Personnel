@@ -160,9 +160,15 @@ class _HomeScreenState extends State<HomeScreen> {
                 padding: const EdgeInsets.only(left: 6),
                 child: Row(
                   children: [
-                    Container(width: 100,
-                      child: Text(_isSwitched ?"Cá nhân" : "Mọi Người", style: GogbalStyles.heading3,)),
-                    SizedBox(width: 10,),
+                    SizedBox(
+                        width: 100,
+                        child: Text(
+                          _isSwitched ? "Cá nhân" : "Mọi Người",
+                          style: GogbalStyles.heading3,
+                        )),
+                    const SizedBox(
+                      width: 10,
+                    ),
                     CustomSwitch(
                       value: _isSwitched,
                       onChanged: (value) {
@@ -176,25 +182,26 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
 
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               ProjectDropdown(
                 projectList: projectList,
                 onProjectSelected: (selectedProject) {
                   setState(() {
                     project = selectedProject?.id;
+                    _apiService.setProjectId(selectedProject?.id);
                   });
                   _fetchTasks();
                 },
               ),
 
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               _buildTable(),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               Divider(),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               Text(
                 "Tasks on ${_startDate != null ? dateFormatD.format(_startDate!) : 'Unknown Date'} - ${_endDate != null ? dateFormatD.format(_endDate!) : 'Unknown Date'}",
-                style: TextStyle(
+                style: const TextStyle(
                   color: Colors.black,
                   fontWeight: FontWeight.bold,
                   fontSize: 16,
@@ -217,16 +224,24 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         );
                       },
-                      child: Card(
+                      child: Container(
                         margin: const EdgeInsets.symmetric(vertical: 8),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          border: Border.all(
+                            width: 1.0,
+                            color: Colors.grey.shade400,
+                          ),
+                          borderRadius: BorderRadius.circular(16.0),
+                        ),
                         child: ListTile(
                           contentPadding:
                               const EdgeInsets.symmetric(horizontal: 16),
-                          title: Container(
+                          title: SizedBox(
                             width: screenWidth * 0.7,
                             child: Text(
                               task.title,
-                              style: TextStyle(fontWeight: FontWeight.bold),
+                              style: const TextStyle(fontWeight: FontWeight.bold),
                               overflow: TextOverflow.ellipsis,
                               maxLines: 1,
                             ),
@@ -236,11 +251,11 @@ class _HomeScreenState extends State<HomeScreen> {
                             children: [
                               Text(
                                 task.state,
-                                style: TextStyle(
+                                style: const TextStyle(
                                     color: Colors.green,
                                     fontWeight: FontWeight.bold),
                               ),
-                              Icon(Icons.arrow_drop_down, size: 24),
+                              const Icon(Icons.arrow_drop_down, size: 24),
                             ],
                           ),
                         ),
@@ -249,7 +264,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   },
                 )
               else
-                _buidlFreetime()
+                _buidlFreetime(),
+                const SizedBox(height: 16,),
             ],
           ),
         ),
@@ -258,76 +274,72 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildTable() {
-    return TableCalendar(
-      headerStyle: HeaderStyle(
-        formatButtonVisible: false,
-        titleCentered: true,
-        headerMargin: EdgeInsets.only(bottom: 16),
-        titleTextStyle: TextStyle(
-          fontSize: 20.0,
-          fontWeight: FontWeight.bold,
-          color: Colors.black87,
+    return Container(
+      color: Colors.white,
+      child: TableCalendar(
+        headerStyle: const HeaderStyle(
+          formatButtonVisible: false,
+          titleCentered: true,
+          headerMargin: EdgeInsets.only(bottom: 16),
+          titleTextStyle: TextStyle(
+            fontSize: 20.0,
+            fontWeight: FontWeight.bold,
+            color: Colors.black87,
+          ),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
+          ),
         ),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.1),
-              offset: Offset(0, 4),
-              blurRadius: 8,
-            ),
-          ],
+        availableGestures: AvailableGestures.all,
+        rowHeight: 60,
+        selectedDayPredicate: (day) {
+          return isSameDay(day, _startDate) || isSameDay(day, _endDate);
+        },
+        focusedDay: _focusedDay,
+        firstDay: DateTime.utc(2010, 08, 08),
+        lastDay: DateTime.utc(2025, 12, 12),
+        onDaySelected: _onDaySelected,
+        onPageChanged: (focusedDay) {
+          setState(() {
+            _focusedDay = focusedDay;
+          });
+        },
+        calendarStyle: CalendarStyle(
+          cellMargin: const EdgeInsets.all(6.0),
+          outsideDaysVisible: false,
+          defaultDecoration: BoxDecoration(
+            color: Colors.white,
+            shape: BoxShape.rectangle,
+            borderRadius: BorderRadius.circular(8.0),
+            border: Border.all(color: Colors.grey.shade300, width: 1.0),
+          ),
+          weekendDecoration: BoxDecoration(
+            color: Colors.white,
+            shape: BoxShape.rectangle,
+            borderRadius: BorderRadius.circular(8.0),
+            border: Border.all(color: Colors.grey.shade300, width: 1.0),
+          ),
+          outsideDecoration: BoxDecoration(
+            color: Colors.white,
+            shape: BoxShape.rectangle,
+            borderRadius: BorderRadius.circular(8.0),
+            border: Border.all(color: Colors.grey.shade300, width: 1.0),
+          ),
+          todayDecoration: BoxDecoration(
+            color: Colors.indigo.shade200,
+            shape: BoxShape.rectangle,
+            borderRadius: BorderRadius.circular(8.0),
+            border: Border.all(color: dark_blue, width: 1.0),
+          ),
+          selectedDecoration: BoxDecoration(
+            color: dark_blue,
+            shape: BoxShape.rectangle,
+            borderRadius: BorderRadius.circular(8.0),
+            border: Border.all(color: Colors.blue.shade300, width: 1.0),
+          ),
+          rangeHighlightColor: Colors.blue.shade100.withOpacity(0.5),
         ),
-      ),
-      availableGestures: AvailableGestures.all,
-      rowHeight: 60,
-      selectedDayPredicate: (day) {
-        return isSameDay(day, _startDate) || isSameDay(day, _endDate);
-      },
-      focusedDay: _focusedDay,
-      firstDay: DateTime.utc(2010, 08, 08),
-      lastDay: DateTime.utc(2025, 12, 12),
-      onDaySelected: _onDaySelected,
-      onPageChanged: (focusedDay) {
-        setState(() {
-          _focusedDay = focusedDay;
-        });
-      },
-      calendarStyle: CalendarStyle(
-        cellMargin: EdgeInsets.all(6.0),
-        outsideDaysVisible: false,
-        defaultDecoration: BoxDecoration(
-          color: Colors.white,
-          shape: BoxShape.rectangle,
-          borderRadius: BorderRadius.circular(8.0),
-          border: Border.all(color: Colors.grey.shade300, width: 1.0),
-        ),
-        weekendDecoration: BoxDecoration(
-          color: Colors.white,
-          shape: BoxShape.rectangle,
-          borderRadius: BorderRadius.circular(8.0),
-          border: Border.all(color: Colors.grey.shade300, width: 1.0),
-        ),
-        outsideDecoration: BoxDecoration(
-          color: Colors.white,
-          shape: BoxShape.rectangle,
-          borderRadius: BorderRadius.circular(8.0),
-          border: Border.all(color: Colors.grey.shade300, width: 1.0),
-        ),
-        todayDecoration: BoxDecoration(
-          color: Colors.indigo.shade200,
-          shape: BoxShape.rectangle,
-          borderRadius: BorderRadius.circular(8.0),
-          border: Border.all(color: dark_blue, width: 1.0),
-        ),
-        selectedDecoration: BoxDecoration(
-          color: dark_blue,
-          shape: BoxShape.rectangle,
-          borderRadius: BorderRadius.circular(8.0),
-          border: Border.all(color: Colors.blue.shade300, width: 1.0),
-        ),
-        rangeHighlightColor: Colors.blue.shade100.withOpacity(0.5),
       ),
     );
   }

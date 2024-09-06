@@ -32,7 +32,7 @@ class _ProjectDropdownState extends State<ProjectDropdown> {
     if (widget.projectList != null &&
         widget.projectList != oldWidget.projectList &&
         widget.projectList!.isNotEmpty) {
-      _selectedProject = widget.projectList!.first;
+      _selectedProject = widget.projectList![2];
     }
   }
 
@@ -41,14 +41,17 @@ class _ProjectDropdownState extends State<ProjectDropdown> {
     final screenWidth = MediaQuery.of(context).size.width;
 
     return Container(
-      width: screenWidth * 0.9,
-      height: 60,
+      width: screenWidth ,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12)
+      ),
       child: DropdownButtonFormField<Project>(
         decoration: InputDecoration(
           contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide(color: Colors.grey.shade300),
+            borderSide: BorderSide(color: Colors.grey.shade400),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
@@ -56,7 +59,7 @@ class _ProjectDropdownState extends State<ProjectDropdown> {
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide(color: Colors.grey.shade300),
+            borderSide: BorderSide(color: Colors.grey.shade400),
           ),
         ),
         isExpanded: true,

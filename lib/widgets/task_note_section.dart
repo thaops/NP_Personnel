@@ -34,9 +34,10 @@ class TaskNoteSection extends StatelessWidget {
             height: 100,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(8.0),
+              color: Colors.white,
               border: Border.all(
                 width: 1.0,
-                color: Theme.of(context).colorScheme.outline,
+                color: Colors.grey.shade400,
               ),
             ),
             child: Padding(
