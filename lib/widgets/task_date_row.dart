@@ -40,56 +40,52 @@ class TaskDateRow extends StatelessWidget {
                 fontWeight: FontWeight.w600,
                 color: Theme.of(context).colorScheme.onBackground),
           ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: GestureDetector(
-              onTap: () {
-                _selectDateTime(context, dateTime, isStartDate);
-              },
-              child: Container(
-                height: 40,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(8.0),
-                  border: Border.all(
-                    width: 1.0,
-                    color: Colors.grey.shade400,
-                  ),
+          const SizedBox(height: 8),
+          GestureDetector(
+            onTap: () {
+              _selectDateTime(context, dateTime, isStartDate);
+            },
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(8.0),
+                border: Border.all(
+                  width: 1.0,
+                  color: Colors.grey.shade400,
                 ),
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        _formatDate(dateTime),
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              fontWeight: FontWeight.w500,
-                              color: Theme.of(context).colorScheme.onSurface,
-                            ),
-                      ),
-                      Text(
-                        _formatTime(dateTime),
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              fontWeight: FontWeight.w400,
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .onSurfaceVariant,
-                            ),
-                      ),
-                    ],
-                  ),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      _formatDate(dateTime),
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            fontWeight: FontWeight.w500,
+                            color: Theme.of(context).colorScheme.onSurface,
+                          ),
+                    ),
+                    Text(
+                      _formatTime(dateTime),
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            fontWeight: FontWeight.w400,
+                            color:
+                                Theme.of(context).colorScheme.onSurfaceVariant,
+                          ),
+                    ),
+                  ],
                 ),
               ),
             ),
-          ),
+          )
         ],
       ),
     );
   }
 
   String _formatDate(DateTime dateTime) {
-    return DateFormat('yyyy-MM-dd').format(dateTime);
+    return DateFormat('dd-MM-yyyy').format(dateTime);
   }
 
   String _formatTime(DateTime dateTime) {

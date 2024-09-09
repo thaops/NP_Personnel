@@ -33,6 +33,11 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
   late DateTime _dueDate;
   late String _status;
   late String _priority;
+  late String _sprintTitle;
+  late String _sprintId;
+  late String _creatorId;
+  late String _project;
+  late String _creator;
   List<UserModel>? users;
   String? usersID;
   bool _isWbs = false;
@@ -48,9 +53,13 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
     _dueDate = widget.task.dueDate;
     _status = widget.task.state;
     _priority = widget.task.priority;
+    _sprintId = widget.task.sprintId;
+    _project = widget.task.project;
+    _creatorId = widget.task.creatorId;
+    _sprintTitle = widget.task.sprintTitle;
+    _creator = widget.task.creator;
     fetchUsers();
     fetchSprint();
-     print("task : ${widget.task}");
   }
 
   @override
@@ -142,12 +151,10 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
       'dueDate': _dueDate.toIso8601String(),
       'state': _status.toLowerCase(),
       'priority': _priority.toLowerCase(),
-      'assigneeId': usersID,
+      'assigneeId': usersID ?? _creatorId,
       "wbs": _isWbs,
-      'sprintId': sprintID,
+      'sprintId': sprintID ?? _sprintId,
     };
-
-    print("Update Data: $updateData");
 
     final response =
         await apiService.updateTask(taskId, accessToken, updateData);
@@ -166,7 +173,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
   @override
   Widget build(BuildContext context) {
     final taskId = widget.task.id;
-   
+
     final screenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
       appBar: AppBar(
@@ -180,11 +187,6 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
         elevation: 4,
         backgroundColor: dark_blue,
         toolbarHeight: 80,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(
-            bottom: Radius.circular(16.0),
-          ),
-        ),
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
@@ -216,6 +218,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
               const SizedBox(height: 24),
               TaskSprintRow(
                 label1: "Sprint",
+                nameSprint: _sprintTitle,
                 sprintsList: sprints,
                 onProjectSelected: (selectedSprint) {
                   setState(() {
@@ -251,6 +254,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
               SizedBox(height: 16),
               TaskInfoRow(
                 label1: "Nhân Viên",
+                name: _creator,
                 usersList: users,
                 onProjectSelected: (selectedUser) {
                   setState(() {

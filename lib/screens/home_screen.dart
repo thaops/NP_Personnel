@@ -36,8 +36,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   bool _isSwitched = false;
 
-  final DateFormat dateFormat = DateFormat('yyyy-MM-dd HH:mm:ss.SSS');
-  final DateFormat dateFormatD = DateFormat('yyyy-MM-dd');
+  final DateFormat dateFormat = DateFormat('dd-MM-yyyy HH:mm:ss.SSS');
+  final DateFormat dateFormatD = DateFormat('dd-MM-yyyy');
   void _checkAndFetchTasks() {
     if (_startDate != null && _endDate != null) {
       _fetchTasks();
@@ -50,12 +50,11 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _fetchTasks() async {
-    print('Fetching tasks...');
-
     try {
       if (widget.accessToken.isNotEmpty &&
           _startDate != null &&
           _endDate != null) {
+        project ??= '';
         tasks = await _apiService.fetchTasks(
             widget.accessToken, _startDate!, _endDate!, project!, _isSwitched);
         setState(() {});
@@ -64,6 +63,9 @@ class _HomeScreenState extends State<HomeScreen> {
       }
     } catch (e) {
       print('Error fetching tasks: $e');
+      setState(() {
+        tasks = [];
+      });
     }
   }
 
@@ -104,11 +106,45 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  Future<void> _refreshProjects() async {
+    await _fetchTasks();
+  }
+
   final AuthService _authService = AuthService();
 
-  Future<void> _signOut() async {
-    await _authService.signOut();
-    context.go('/login', extra: {'replace': true});
+  Future<void> _signOut(BuildContext context) async {
+    final shouldSignOut = await showDialog<bool>(
+      context: context,
+      barrierDismissible:
+          false, // Ngăn người dùng đóng hộp thoại bằng cách nhấn ngoài nó
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Xác nhận đăng xuất'),
+          content: Text('Bạn muốn đăng xuất không?'),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Hủy'),
+              onPressed: () {
+                Navigator.of(context)
+                    .pop(false); // Đóng hộp thoại và trả về false
+              },
+            ),
+            TextButton(
+              child: Text('Đăng xuất'),
+              onPressed: () {
+                Navigator.of(context)
+                    .pop(true); // Đóng hộp thoại và trả về true
+              },
+            ),
+          ],
+        );
+      },
+    );
+
+    if (shouldSignOut == true) {
+      await _authService.signOut();
+      context.go('/login', extra: {'replace': true});
+    }
   }
 
   @override
@@ -145,7 +181,7 @@ class _HomeScreenState extends State<HomeScreen> {
         actions: [
           IconButton(
             icon: Icon(Icons.logout),
-            onPressed: _signOut,
+            onPressed: () => _signOut(context),
           ),
         ],
       ),
@@ -154,8 +190,6 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Center(
           child: Column(
             children: [
-              // _buidlSearch(),
-              // SizedBox(height: 16),
               Padding(
                 padding: const EdgeInsets.only(left: 6),
                 child: Row(
@@ -181,7 +215,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   ],
                 ),
               ),
-
               const SizedBox(height: 16),
               ProjectDropdown(
                 projectList: projectList,
@@ -192,8 +225,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   });
                   _fetchTasks();
                 },
+                onRefresh: _refreshProjects,
               ),
-
               const SizedBox(height: 16),
               _buildTable(),
               const SizedBox(height: 20),
@@ -241,7 +274,8 @@ class _HomeScreenState extends State<HomeScreen> {
                             width: screenWidth * 0.7,
                             child: Text(
                               task.title,
-                              style: const TextStyle(fontWeight: FontWeight.bold),
+                              style:
+                                  const TextStyle(fontWeight: FontWeight.bold),
                               overflow: TextOverflow.ellipsis,
                               maxLines: 1,
                             ),
@@ -265,7 +299,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 )
               else
                 _buidlFreetime(),
-                const SizedBox(height: 16,),
+              const SizedBox(
+                height: 16,
+              ),
             ],
           ),
         ),

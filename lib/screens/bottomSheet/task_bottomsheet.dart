@@ -52,7 +52,7 @@ class _TaskBottomsheetState extends State<TaskBottomsheet> {
 
   void _update() {
     GoRouter.of(context)
-        .push('/details/tasks', extra: widget.task)
+        .push('/details/tasks', extra: _fetchedTask)
         .then((value) {
       if (value == true) {
         widget.onUpdateCallback(true);
@@ -66,18 +66,41 @@ class _TaskBottomsheetState extends State<TaskBottomsheet> {
     final accessToken = apiService.accessTokenId;
     final taskId = widget.task.id;
 
-    final bool success = await apiService.deleteTask(taskId, accessToken);
+    // Hiển thị hộp thoại xác nhận trước khi xóa
+    final bool? confirmDelete = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Xác nhận xóa'),
+          content: Text('Bạn muốn xóa task này?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: Text('Hủy'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: Text('Xóa'),
+            ),
+          ],
+        );
+      },
+    );
 
-    if (success) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Xóa task thành công')),
-      );
-      widget.onUpdateCallback(true);
-      Navigator.of(context).pop();
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Xóa task thất bại')),
-      );
+    if (confirmDelete == true) {
+      final bool success = await apiService.deleteTask(taskId, accessToken);
+
+      if (success) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Xóa task thành công')),
+        );
+        widget.onUpdateCallback(true);
+        Navigator.of(context).pop();
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Xóa task thất bại')),
+        );
+      }
     }
   }
 
@@ -88,123 +111,125 @@ class _TaskBottomsheetState extends State<TaskBottomsheet> {
 
     return Container(
       width: screenWidth,
-      child: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Container(
-                  width: screenWidth * 0.6,
-                  child: Text(
-                    _fetchedTask?.title ?? widget.task.title,
-                    style: GogbalStyles.heading2,
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 1,
-                  ),
-                ),
-                Row(
-                  children: [
-                    IconButton(
-                      icon: Icon(Icons.edit, color: Colors.black),
-                      onPressed: () {
-                        _update();
-                      },
-                    ),
-                    IconButton(
-                      icon: Icon(Icons.delete, color: Colors.red),
-                      onPressed: () {
-                        _delete();
-                      },
-                    ),
-                  ],
-                ),
-              ],
-            ),
-            Padding(
-              padding: const EdgeInsets.all(10),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+      child: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  TextTasks(
-                    text1: 'Dự án',
-                    text2: _fetchedTask?.project ?? widget.task.project,
-                  ),
-                  SizedBox(height: 20),
-                  TextTasks(
-                    text1: 'Nhân viên',
-                    text2: _fetchedTask?.creator ?? widget.task.creator,
-                  ),
-                  SizedBox(height: 20),
                   Container(
-                    width: screenWidth,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Expanded(
-                          flex: 1,
-                          child: Align(
-                            alignment: Alignment.centerLeft,
-                            child: TextTasks(
-                              text1: 'Độ ưu tiên',
-                              text2: _fetchedTask?.priority ??
-                                  widget.task.priority,
-                            ),
-                          ),
-                        ),
-                        SizedBox(width: 20),
-                        Expanded(
-                          flex: 1,
-                          child: Align(
-                            alignment: Alignment.centerLeft,
-                            child: TextTasks(
-                              text1: 'Trạng thái',
-                              text2: _fetchedTask?.state ?? widget.task.state,
-                            ),
-                          ),
-                        ),
-                      ],
+                    width: screenWidth * 0.6,
+                    child: Text(
+                      _fetchedTask?.title ?? widget.task.title,
+                      style: GogbalStyles.heading2,
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
                     ),
                   ),
-                  SizedBox(height: 20),
-                  Container(
-                    width: screenWidth,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Expanded(
-                          child: TextTasks(
-                            text1: 'Ngày bắt đầu',
-                            text2: dateFormatD.format(_fetchedTask?.startDate ??
-                                widget.task.startDate),
-                          ),
-                        ),
-                        SizedBox(width: 20),
-                        Expanded(
-                          child: Align(
-                            alignment: Alignment.centerLeft,
-                            child: TextTasks(
-                              text1: 'Ngày kết thúc',
-                              text2: dateFormatD.format(
-                                  _fetchedTask?.dueDate ?? widget.task.dueDate),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  SizedBox(height: 20),
-                  TextTasks(
-                    text1: 'Chú thích',
-                    text2: _fetchedTask?.note ?? widget.task.note,
+                  Row(
+                    children: [
+                      IconButton(
+                        icon: Icon(Icons.edit, color: Colors.black),
+                        onPressed: () {
+                          _update();
+                        },
+                      ),
+                      IconButton(
+                        icon: Icon(Icons.delete, color: Colors.red),
+                        onPressed: () {
+                          _delete();
+                        },
+                      ),
+                    ],
                   ),
                 ],
               ),
-            ),
-          ],
+              Padding(
+                padding: const EdgeInsets.all(10),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    TextTasks(
+                      text1: 'Dự án',
+                      text2: _fetchedTask?.project ?? widget.task.project,
+                    ),
+                    SizedBox(height: 20),
+                    TextTasks(
+                      text1: 'Nhân viên',
+                      text2: _fetchedTask?.creator ?? widget.task.creator,
+                    ),
+                    SizedBox(height: 20),
+                    Container(
+                      width: screenWidth,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            flex: 1,
+                            child: Align(
+                              alignment: Alignment.centerLeft,
+                              child: TextTasks(
+                                text1: 'Độ ưu tiên',
+                                text2: _fetchedTask?.priority ??
+                                    widget.task.priority,
+                              ),
+                            ),
+                          ),
+                          SizedBox(width: 20),
+                          Expanded(
+                            flex: 1,
+                            child: Align(
+                              alignment: Alignment.centerLeft,
+                              child: TextTasks(
+                                text1: 'Trạng thái',
+                                text2: _fetchedTask?.state ?? widget.task.state,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(height: 20),
+                    Container(
+                      width: screenWidth,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            child: TextTasks(
+                              text1: 'Ngày bắt đầu',
+                              text2: dateFormatD.format(_fetchedTask?.startDate ??
+                                  widget.task.startDate),
+                            ),
+                          ),
+                          SizedBox(width: 20),
+                          Expanded(
+                            child: Align(
+                              alignment: Alignment.centerLeft,
+                              child: TextTasks(
+                                text1: 'Ngày kết thúc',
+                                text2: dateFormatD.format(
+                                    _fetchedTask?.dueDate ?? widget.task.dueDate),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(height: 20),
+                    TextTasks(
+                      text1: 'Chú thích',
+                      text2: _fetchedTask?.note ?? widget.task.note,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

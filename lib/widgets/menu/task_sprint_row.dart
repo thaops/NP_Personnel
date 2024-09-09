@@ -1,14 +1,18 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
+
 import 'package:hocflutter/Api/models/sprint_model.dart';
 
 class TaskSprintRow extends StatefulWidget {
   final String label1;
+  final String? nameSprint;
   final List<Sprint>? sprintsList;
   final void Function(Sprint?)? onProjectSelected;
 
   TaskSprintRow({
     Key? key,
     required this.label1,
+    this.nameSprint,
     this.sprintsList,
     this.onProjectSelected,
   }) : super(key: key);
@@ -22,6 +26,7 @@ class _TaskSprintRowState extends State<TaskSprintRow> {
 
   @override
   Widget build(BuildContext context) {
+    print("nameSprint : ${widget.nameSprint}");
     final screenWidth = MediaQuery.of(context).size.width;
 
     final sprints = widget.sprintsList ?? [];
@@ -31,7 +36,7 @@ class _TaskSprintRowState extends State<TaskSprintRow> {
 
     return Center(
       child: Container(
-        width: screenWidth ,
+        width: screenWidth,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -42,11 +47,13 @@ class _TaskSprintRowState extends State<TaskSprintRow> {
                     color: Theme.of(context).colorScheme.onBackground,
                   ),
             ),
-            SizedBox(height: 10,),
+            SizedBox(
+              height: 10,
+            ),
             Container(
-              width: screenWidth ,
-               decoration: BoxDecoration(
-            color: Colors.white, borderRadius: BorderRadius.circular(12)),
+              width: screenWidth,
+              decoration: BoxDecoration(
+                  color: Colors.white, borderRadius: BorderRadius.circular(12)),
               child: DropdownButtonFormField<Sprint>(
                 decoration: InputDecoration(
                   contentPadding:
@@ -63,10 +70,10 @@ class _TaskSprintRowState extends State<TaskSprintRow> {
                     borderRadius: BorderRadius.circular(12),
                     borderSide: BorderSide(color: Colors.grey.shade300),
                   ),
-                  hintText: 'Select a Sprint',
                 ),
                 isExpanded: true,
                 value: _selectedSprint,
+                hint: Text(widget.nameSprint ?? 'Select a Sprint'),
                 onChanged: (Sprint? newValue) {
                   setState(() {
                     _selectedSprint = newValue;
@@ -79,7 +86,7 @@ class _TaskSprintRowState extends State<TaskSprintRow> {
                   return DropdownMenuItem<Sprint>(
                     value: sprint,
                     child: Text(
-                      sprint.title,
+                     sprint.title,
                       style: TextStyle(color: Colors.black87),
                     ),
                   );

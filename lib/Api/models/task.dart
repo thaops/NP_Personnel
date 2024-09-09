@@ -1,4 +1,3 @@
-
 class Task {
   final String id;
   final String title;
@@ -10,6 +9,10 @@ class Task {
   final String project;
   final DateTime startDate;
   final DateTime dueDate;
+  final String projectId;
+  final String sprintId;
+  final String sprintTitle;
+  final String creatorId;
 
   Task({
     required this.id,
@@ -22,6 +25,10 @@ class Task {
     required this.project,
     required this.startDate,
     required this.dueDate,
+    required this.projectId,
+    required this.sprintId,
+    required this.sprintTitle,
+    required this.creatorId, 
   });
 
   factory Task.fromJson(Map<String, dynamic> json) {
@@ -33,18 +40,22 @@ class Task {
       priority: json['priority'] ?? '',
       creator: json['creator'] ?? '',
       note: json['note'] ?? '',
-      project: json['project'] ?? '', 
+      project: json['project'] ?? '',
       startDate: json['startDate'] != null
           ? DateTime.parse(json['startDate'])
           : DateTime.now(),
       dueDate: json['dueDate'] != null
           ? DateTime.parse(json['dueDate'])
           : DateTime.now(),
+      projectId: json['projectId'] ?? '',
+      sprintId: json['sprintId'] ?? '',
+      sprintTitle: json['sprintTitle'] ?? '',
+      creatorId: json['creatorId'] ?? '', 
     );
   }
 
   @override
   String toString() {
-    return 'Task{id: $id, title: $title, description: $description, state: $state, priority: $priority, creator: $creator, note: $note, project: $project, startDate: $startDate, dueDate: $dueDate}';
+    return 'Task{id: $id, title: $title, description: $description, state: $state, priority: $priority, creator: $creator, note: $note, project: $project, startDate: $startDate, dueDate: $dueDate, projectId: $projectId, sprintId: $sprintId, sprintTitle: $sprintTitle, creatorId: $creatorId}';
   }
 }

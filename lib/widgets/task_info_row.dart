@@ -1,14 +1,18 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
+
 import 'package:hocflutter/Api/models/Users.dart';
 
 class TaskInfoRow extends StatefulWidget {
   final String label1;
+  final String? name;
   final List<UserModel>? usersList;
   final void Function(UserModel?)? onProjectSelected;
 
   TaskInfoRow({
     Key? key,
     required this.label1,
+    this.name,
     this.usersList,
     this.onProjectSelected,
   }) : super(key: key);
@@ -24,7 +28,7 @@ class _TaskInfoRowState extends State<TaskInfoRow> {
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     return Container(
-      width: screenWidth ,
+      width: screenWidth,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -35,11 +39,13 @@ class _TaskInfoRowState extends State<TaskInfoRow> {
                   color: Theme.of(context).colorScheme.onBackground,
                 ),
           ),
-          SizedBox(height: 10,),
+          SizedBox(
+            height: 10,
+          ),
           Container(
-            width: screenWidth ,
-             decoration: BoxDecoration(
-          color: Colors.white, borderRadius: BorderRadius.circular(12)),
+            width: screenWidth,
+            decoration: BoxDecoration(
+                color: Colors.white, borderRadius: BorderRadius.circular(12)),
             child: DropdownButtonFormField<UserModel>(
               decoration: InputDecoration(
                 contentPadding:
@@ -56,10 +62,11 @@ class _TaskInfoRowState extends State<TaskInfoRow> {
                   borderRadius: BorderRadius.circular(12),
                   borderSide: BorderSide(color: Colors.grey.shade300),
                 ),
-                hintText: 'Select a Project',
+               
               ),
               isExpanded: true,
               value: _selectedUser,
+              hint: Text(widget.name ?? 'Pham dong Thao'),
               onChanged: (UserModel? newValue) {
                 setState(() {
                   _selectedUser = newValue;

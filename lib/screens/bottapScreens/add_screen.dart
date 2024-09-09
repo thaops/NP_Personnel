@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hocflutter/Api/api_service.dart';
 import 'package:hocflutter/Api/models/ProjectRes.dart';
 import 'package:hocflutter/Api/models/Users.dart';
+import 'package:hocflutter/Api/models/profileModel.dart';
 import 'package:hocflutter/Api/models/sprint_model.dart';
 import 'package:hocflutter/config/constants/colors.dart';
 import 'package:hocflutter/config/router/router.dart';
@@ -38,8 +39,10 @@ class _AddScreenState extends State<AddScreen> {
   List<Project>? projectList;
   String? project;
   List<Sprint>? sprints;
+  Profile? profile;
   String? sprintID;
   bool _isWbs = false;
+
   final DateFormat dateFormat = DateFormat('yyyy-MM-dd HH:mm');
 
   @override
@@ -54,6 +57,7 @@ class _AddScreenState extends State<AddScreen> {
     fetchUsers();
     _fetchProject();
     fetchSprint();
+    fetchProfile();
   }
 
   Future<void> _fetchProject() async {
@@ -88,6 +92,28 @@ class _AddScreenState extends State<AddScreen> {
         if (response != null) {
           setState(() {
             sprints = response;
+          });
+        } else {
+          print('No user data found.');
+        }
+      } else {
+        print('Access token is missing.');
+      }
+    } catch (e) {
+      print('Error fetching users: $e');
+    }
+  }
+
+  Future<void> fetchProfile() async {
+    final apiService = Provider.of<ApiService>(context, listen: false);
+    final accessToken = apiService.accessTokenId;
+
+    try {
+      if (accessToken.isNotEmpty) {
+        final response = await _apiService.getProfile(accessToken);
+        if (response != null) {
+          setState(() {
+            profile = response;
           });
         } else {
           print('No user data found.');
@@ -157,10 +183,10 @@ class _AddScreenState extends State<AddScreen> {
       'dueDate': _dueDate.toIso8601String(),
       'state': _status,
       'priority': _priority,
-      'projectId': project,
-      'sprintId': sprintID,
+      'projectId': project ?? '09764aab-bfe7-4602-b416-0a9057ceda5d',
+      'sprintId': sprintID ?? 'd142acbc-bbe0-4963-82de-1d4f13319953',
       'parentTaskId': null,
-      'assigneeId': usersID,
+      'assigneeId': usersID ?? profile?.id,
       "wbs": _isWbs
     };
 
@@ -194,11 +220,6 @@ class _AddScreenState extends State<AddScreen> {
         elevation: 4,
         backgroundColor: dark_blue,
         toolbarHeight: 80,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(
-            bottom: Radius.circular(16.0),
-          ),
-        ),
         actions: [
           SizedBox(width: 16),
           IconButton(
@@ -232,12 +253,14 @@ class _AddScreenState extends State<AddScreen> {
                 onProjectSelected: (selectedProject) {
                   setState(() {
                     project = selectedProject?.id;
+                    _apiService.setProjectId(selectedProject?.id);
                   });
                 },
               ),
               SizedBox(height: 16),
               TaskSprintRow(
                 label1: "Sprint",
+                nameSprint: 'Sprint 3',
                 sprintsList: sprints,
                 onProjectSelected: (selectedSprint) {
                   setState(() {
@@ -273,6 +296,7 @@ class _AddScreenState extends State<AddScreen> {
               SizedBox(height: 16),
               TaskInfoRow(
                 label1: "Nhân Viên",
+                name: profile?.fullName,
                 usersList: users,
                 onProjectSelected: (selectedUser) {
                   setState(() {
@@ -321,7 +345,9 @@ class _AddScreenState extends State<AddScreen> {
                   ),
                 ),
               ),
-              const SizedBox(height: 16,),
+              const SizedBox(
+                height: 16,
+              ),
             ],
           ),
         ),
