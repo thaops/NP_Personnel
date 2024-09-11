@@ -96,7 +96,7 @@ class LoginScreen extends StatelessWidget {
                     String? accessToken = googleAuth.accessToken;
                     if (accessToken != null) {
                       var response =
-                          await _apiService.sendTokenToApi(accessToken);
+                          await _apiService.sendTokenToApi(accessToken,context);
                       var accessTokenId = response.accessToken.toString();
                       if (response.statusCode == 200) {
                           Provider.of<ApiService>(context, listen: false)

@@ -6,11 +6,23 @@ import 'package:hocflutter/Api/models/profileModel.dart';
 import 'package:hocflutter/Api/models/sprint_model.dart';
 import 'package:hocflutter/Api/models/task.dart';
 import 'package:hocflutter/Api/models/taskResponse.dart';
+import 'package:hocflutter/config/constants/api.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+import 'package:provider/provider.dart';
+
 class ApiService extends ChangeNotifier {
-  final String _baseUrl = 'https://napro-api.azurewebsites.net/api';
+
+  bool _isVision = true;
+
+  bool get isVision => _isVision;
+
+  void setIsVision(bool vision) {
+    _isVision = vision;
+     print('isVision updated: $_isVision');
+    notifyListeners(); 
+  }
 
   String? _projectId;
   String? get projectId => _projectId;
@@ -25,13 +37,15 @@ class ApiService extends ChangeNotifier {
     _accessTokenId = token;
     notifyListeners();
   }
+  String getBaseUrl(BuildContext context) {
+    return BaseUrlProvider.getBaseUrl(context);
+  }
 
-  bool isLoading = true;
-  String err = '';
+
   Future<taskResponse> updateTask(String taskId, String accessToken,
-      Map<String, dynamic> updateData) async {
-    final String url = '$_baseUrl/tasks/$taskId';
-    print("url : $url");
+      Map<String, dynamic> updateData,BuildContext context) async {
+        
+    final String url = '${getBaseUrl(context)}/tasks/$taskId';
     try {
       final response = await http.put(
         Uri.parse(url),
@@ -66,8 +80,8 @@ class ApiService extends ChangeNotifier {
     }
   }
 
-  Future<Task?> getTask(String taskId, String accessToken) async {
-    final String url = '$_baseUrl/tasks/$taskId';
+  Future<Task?> getTask(String taskId, String accessToken,BuildContext context) async {
+    final String url = '${getBaseUrl(context)}/tasks/$taskId';
 
     try {
       final response = await http.get(
@@ -92,8 +106,8 @@ class ApiService extends ChangeNotifier {
     }
   }
 
-  Future<bool> deleteTask(String taskId, String accessToken) async {
-    final String url = '$_baseUrl/tasks/$taskId';
+  Future<bool> deleteTask(String taskId, String accessToken,BuildContext context) async {
+    final String url = '${getBaseUrl(context)}/tasks/$taskId';
 
     try {
       final response = await http.delete(
@@ -118,8 +132,8 @@ class ApiService extends ChangeNotifier {
   }
 
   Future<taskResponse> addTask(
-      String accessToken, Map<String, dynamic> addData) async {
-    final String url = '$_baseUrl/tasks';
+      String accessToken, Map<String, dynamic> addData,BuildContext context) async {
+    final String url = '${getBaseUrl(context)}/tasks';
     try {
       final response = await http.post(
         Uri.parse(url),
@@ -151,9 +165,9 @@ class ApiService extends ChangeNotifier {
     }
   }
 
-  Future<ApiResponse> sendTokenToApi(String token) async {
+  Future<ApiResponse> sendTokenToApi(String token,BuildContext context) async {
     final response = await http.post(
-      Uri.parse('https://napro-api.azurewebsites.net/api/users/oauth2-google'),
+      Uri.parse('${getBaseUrl(context)}/users/oauth2-google'),
       headers: {
         'Content-Type': 'application/json',
       },
@@ -173,9 +187,9 @@ class ApiService extends ChangeNotifier {
   }
 
   Future<List<Task>> fetchTasks(String accessToken, DateTime startDate,
-      DateTime endDate, String project, bool _isSwitched) async {
+      DateTime endDate, String project, bool _isSwitched,BuildContext context) async {
     final url = Uri.parse(
-      '$_baseUrl/tasks?project=$project&page=1&pageSize=50&StartDate=${startDate.toIso8601String()}&EndDate=${endDate.toIso8601String()}&ForMe=$_isSwitched',
+      '${getBaseUrl(context)}/tasks?project=$project&page=1&pageSize=50&StartDate=${startDate.toIso8601String()}&EndDate=${endDate.toIso8601String()}&ForMe=$_isSwitched',
     );
 
     final response = await http.get(
@@ -201,8 +215,8 @@ class ApiService extends ChangeNotifier {
     }
   }
 
-  Future<List<Project>?> getProject(String accessToken) async {
-    final String url = '$_baseUrl/projects?page=1&pageSize=9999';
+  Future<List<Project>?> getProject(String accessToken,BuildContext context) async {
+    final String url = '${getBaseUrl(context)}/projects?page=1&pageSize=9999';
     try {
       final response = await http.get(
         Uri.parse(url),
@@ -229,8 +243,8 @@ class ApiService extends ChangeNotifier {
     }
   }
 
-  Future<List<UserModel>?> getUsers(String accessToken) async {
-    final String url = '$_baseUrl/users?page=1&pageSize=9999';
+  Future<List<UserModel>?> getUsers(String accessToken,BuildContext context) async {
+    final String url = '${getBaseUrl(context)}/users?page=1&pageSize=9999';
     try {
       final response = await http.get(
         Uri.parse(url),
@@ -256,9 +270,9 @@ class ApiService extends ChangeNotifier {
     }
   }
 
-  Future<List<Sprint>?> getSprint(String accessToken, String project) async {
+  Future<List<Sprint>?> getSprint(String accessToken, String project,BuildContext context) async {
     final String url =
-        '$_baseUrl/sprints?project=$project&page=1&pageSize=9999&startDate=2023-12-04&endDate=2222-12-31';
+        '${getBaseUrl(context)}/sprints?project=$project&page=1&pageSize=9999&startDate=2023-12-04&endDate=2222-12-31';
     try {
       final response = await http.get(
         Uri.parse(url),
@@ -284,9 +298,8 @@ class ApiService extends ChangeNotifier {
     }
   }
 
-  Future<Profile?> getProfile(String accessToken) async {
-    final String url = '$_baseUrl/users/profile';
-
+  Future<Profile?> getProfile(String accessToken,BuildContext context) async {
+    final String url = '${getBaseUrl(context)}/users/profile';
     try {
       final response = await http.get(
         Uri.parse(url),
@@ -298,7 +311,7 @@ class ApiService extends ChangeNotifier {
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> jsonResponse = json.decode(response.body);
-          print('JSON Response: $jsonResponse');
+        print('JSON Response: $jsonResponse');
         final Map<String, dynamic> taskJson = jsonResponse['data'];
         return Profile.fromJson(taskJson);
       } else {
@@ -310,5 +323,4 @@ class ApiService extends ChangeNotifier {
       return null;
     }
   }
-
 }

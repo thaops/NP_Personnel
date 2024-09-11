@@ -38,7 +38,7 @@ class _TaskBottomsheetState extends State<TaskBottomsheet> {
 
     print("taskId: $taskId");
 
-    final Task? fetchedTask = await apiService.getTask(taskId, accessToken);
+    final Task? fetchedTask = await apiService.getTask(taskId, accessToken,context);
 
     if (fetchedTask != null) {
       setState(() {
@@ -88,7 +88,7 @@ class _TaskBottomsheetState extends State<TaskBottomsheet> {
     );
 
     if (confirmDelete == true) {
-      final bool success = await apiService.deleteTask(taskId, accessToken);
+      final bool success = await apiService.deleteTask(taskId, accessToken,context);
 
       if (success) {
         ScaffoldMessenger.of(context).showSnackBar(

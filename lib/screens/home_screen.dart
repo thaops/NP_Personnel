@@ -41,7 +41,6 @@ class _HomeScreenState extends State<HomeScreen> {
   void _checkAndFetchTasks() {
     if (_startDate != null && _endDate != null) {
       _fetchTasks();
-      print("projectList $projectList");
     } else {
       setState(() {
         tasks = null;
@@ -56,7 +55,7 @@ class _HomeScreenState extends State<HomeScreen> {
           _endDate != null) {
         project ??= '';
         tasks = await _apiService.fetchTasks(
-            widget.accessToken, _startDate!, _endDate!, project!, _isSwitched);
+            widget.accessToken, _startDate!, _endDate!, project!, _isSwitched,context);
         setState(() {});
       } else {
         print('Access token, start date, or end date is missing.');
@@ -156,7 +155,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> _fetchProject() async {
     try {
       if (widget.accessToken.isNotEmpty) {
-        final response = await _apiService.getProject(widget.accessToken);
+        final response = await _apiService.getProject(widget.accessToken,context);
         if (response != null) {
           setState(() {
             projectList = response;
@@ -172,6 +171,11 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  Future<void> refresh() async {
+    await _fetchTasks();
+    await _fetchProject();
+  }
+
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
@@ -185,124 +189,128 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        child: Center(
-          child: Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(left: 6),
-                child: Row(
-                  children: [
-                    SizedBox(
-                        width: 100,
-                        child: Text(
-                          _isSwitched ? "Cá nhân" : "Mọi Người",
-                          style: GogbalStyles.heading3,
-                        )),
-                    const SizedBox(
-                      width: 10,
-                    ),
-                    CustomSwitch(
-                      value: _isSwitched,
-                      onChanged: (value) {
-                        setState(() {
-                          _isSwitched = value;
-                        });
-                        _fetchTasks();
-                      },
-                    ),
-                  ],
+      body: RefreshIndicator(
+        onRefresh: refresh,
+       
+        child: SingleChildScrollView(
+           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          child: Center(
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(left: 6),
+                  child: Row(
+                    children: [
+                      SizedBox(
+                          width: 100,
+                          child: Text(
+                            _isSwitched ? "Cá nhân" : "Mọi Người",
+                            style: GogbalStyles.heading3,
+                          )),
+                      const SizedBox(
+                        width: 10,
+                      ),
+                      CustomSwitch(
+                        value: _isSwitched,
+                        onChanged: (value) {
+                          setState(() {
+                            _isSwitched = value;
+                          });
+                          _fetchTasks();
+                        },
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              const SizedBox(height: 16),
-              ProjectDropdown(
-                projectList: projectList,
-                onProjectSelected: (selectedProject) {
-                  setState(() {
-                    project = selectedProject?.id;
-                    _apiService.setProjectId(selectedProject?.id);
-                  });
-                  _fetchTasks();
-                },
-                onRefresh: _refreshProjects,
-              ),
-              const SizedBox(height: 16),
-              _buildTable(),
-              const SizedBox(height: 20),
-              Divider(),
-              const SizedBox(height: 20),
-              Text(
-                "Tasks on ${_startDate != null ? dateFormatD.format(_startDate!) : 'Unknown Date'} - ${_endDate != null ? dateFormatD.format(_endDate!) : 'Unknown Date'}",
-                style: const TextStyle(
-                  color: Colors.black,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
+                const SizedBox(height: 16),
+                ProjectDropdown(
+                  projectList: projectList,
+                  onProjectSelected: (selectedProject) {
+                    setState(() {
+                      project = selectedProject?.id;
+                      _apiService.setProjectId(selectedProject?.id);
+                    });
+                    _fetchTasks();
+                  },
+                  onRefresh: _refreshProjects,
                 ),
-              ),
-              if (tasks != null && tasks!.isNotEmpty)
-                ListView.builder(
-                  shrinkWrap: true,
-                  physics: NeverScrollableScrollPhysics(),
-                  itemCount: tasks!.length,
-                  itemBuilder: (context, index) {
-                    final task = tasks![index];
-                    return GestureDetector(
-                      onTap: () {
-                        showModalBottomSheet(
-                          context: context,
-                          builder: (context) => TaskBottomsheet(
-                            task: task,
-                            onUpdateCallback: _updateTaskList,
+                const SizedBox(height: 16),
+                _buildTable(),
+                const SizedBox(height: 20),
+                Divider(),
+                const SizedBox(height: 20),
+                Text(
+                  "Tasks on ${_startDate != null ? dateFormatD.format(_startDate!) : 'Unknown Date'} - ${_endDate != null ? dateFormatD.format(_endDate!) : 'Unknown Date'}",
+                  style: const TextStyle(
+                    color: Colors.black,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
+                ),
+                if (tasks != null && tasks!.isNotEmpty)
+                  ListView.builder(
+                    shrinkWrap: true,
+                    physics: NeverScrollableScrollPhysics(),
+                    itemCount: tasks!.length,
+                    itemBuilder: (context, index) {
+                      final task = tasks![index];
+                      return GestureDetector(
+                        onTap: () {
+                          showModalBottomSheet(
+                            context: context,
+                            builder: (context) => TaskBottomsheet(
+                              task: task,
+                              onUpdateCallback: _updateTaskList,
+                            ),
+                          );
+                        },
+                        child: Container(
+                          margin: const EdgeInsets.symmetric(vertical: 8),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            border: Border.all(
+                              width: 1.0,
+                              color: Colors.grey.shade400,
+                            ),
+                            borderRadius: BorderRadius.circular(16.0),
                           ),
-                        );
-                      },
-                      child: Container(
-                        margin: const EdgeInsets.symmetric(vertical: 8),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          border: Border.all(
-                            width: 1.0,
-                            color: Colors.grey.shade400,
-                          ),
-                          borderRadius: BorderRadius.circular(16.0),
-                        ),
-                        child: ListTile(
-                          contentPadding:
-                              const EdgeInsets.symmetric(horizontal: 16),
-                          title: SizedBox(
-                            width: screenWidth * 0.7,
-                            child: Text(
-                              task.title,
-                              style:
-                                  const TextStyle(fontWeight: FontWeight.bold),
-                              overflow: TextOverflow.ellipsis,
-                              maxLines: 1,
+                          child: ListTile(
+                            contentPadding:
+                                const EdgeInsets.symmetric(horizontal: 16),
+                            title: SizedBox(
+                              width: screenWidth * 0.7,
+                              child: Text(
+                                task.title,
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold),
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
+                              ),
+                            ),
+                            trailing: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  task.state,
+                                  style: const TextStyle(
+                                      color: Colors.green,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                                const Icon(Icons.arrow_drop_down, size: 24),
+                              ],
                             ),
                           ),
-                          trailing: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(
-                                task.state,
-                                style: const TextStyle(
-                                    color: Colors.green,
-                                    fontWeight: FontWeight.bold),
-                              ),
-                              const Icon(Icons.arrow_drop_down, size: 24),
-                            ],
-                          ),
                         ),
-                      ),
-                    );
-                  },
-                )
-              else
-                _buidlFreetime(),
-              const SizedBox(
-                height: 16,
-              ),
-            ],
+                      );
+                    },
+                  )
+                else
+                  _buidlFreetime(),
+                const SizedBox(
+                  height: 16,
+                ),
+              ],
+            ),
           ),
         ),
       ),

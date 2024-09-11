@@ -65,7 +65,7 @@ class _AddScreenState extends State<AddScreen> {
     final accessToken = apiService.accessTokenId;
     try {
       if (accessToken.isNotEmpty) {
-        final response = await _apiService.getProject(accessToken);
+        final response = await _apiService.getProject(accessToken,context);
         if (response != null) {
           setState(() {
             projectList = response;
@@ -88,7 +88,7 @@ class _AddScreenState extends State<AddScreen> {
     try {
       if (accessToken.isNotEmpty) {
         final response = await _apiService.getSprint(
-            accessToken, project ?? '09764aab-bfe7-4602-b416-0a9057ceda5d');
+            accessToken, project ?? '09764aab-bfe7-4602-b416-0a9057ceda5d',context);
         if (response != null) {
           setState(() {
             sprints = response;
@@ -110,7 +110,7 @@ class _AddScreenState extends State<AddScreen> {
 
     try {
       if (accessToken.isNotEmpty) {
-        final response = await _apiService.getProfile(accessToken);
+        final response = await _apiService.getProfile(accessToken,context);
         if (response != null) {
           setState(() {
             profile = response;
@@ -133,7 +133,7 @@ class _AddScreenState extends State<AddScreen> {
     try {
       if (accessToken.isNotEmpty) {
         final response = await _apiService.getUsers(
-          accessToken,
+          accessToken,context
         );
         if (response != null) {
           setState(() {
@@ -190,7 +190,7 @@ class _AddScreenState extends State<AddScreen> {
       "wbs": _isWbs
     };
 
-    final response = await apiService.addTask(accessToken, addData);
+    final response = await apiService.addTask(accessToken, addData,context);
 
     if (response.statusCode == 200) {
       ScaffoldMessenger.of(context).showSnackBar(

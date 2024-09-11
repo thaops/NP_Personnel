@@ -24,7 +24,7 @@ class GogbalStyles {
   // Kiểu chữ nội dung chính
   static const TextStyle bodyText1 = TextStyle(
     fontSize: 16.0,
-    fontWeight: FontWeight.w300,
+    fontWeight: FontWeight.w400,
     color: Colors.black,
   );
 
@@ -34,6 +34,12 @@ class GogbalStyles {
     fontWeight: FontWeight.w500,
     color: Colors.black,
   );
+    static const TextStyle bodyText3 = TextStyle(
+    fontSize: 14.0,
+    fontWeight: FontWeight.w300,
+    color: Colors.black,
+  );
+
 
   // Kiểu chữ cho nút
   static const TextStyle button = TextStyle(
