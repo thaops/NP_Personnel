@@ -4,7 +4,7 @@ import 'package:hocflutter/src/config/constants/color/colors.dart';
 import 'package:hocflutter/src/feature/bottapScreens/add/add_screen.dart';
 import 'package:hocflutter/src/feature/bottapScreens/kanban/notifications_screen.dart';
 import 'package:hocflutter/src/feature/bottapScreens/profile/profile_screen.dart';
-import 'package:hocflutter/src/feature/bottapScreens/list_off/listoff_screen.dart';
+import 'package:hocflutter/src/feature/bottapScreens/list_off/view/listoff_screen.dart';
 import 'package:hocflutter/src/feature/bottapScreens/home/view/home_screen.dart';
 import 'package:hocflutter/src/Api/provider/api_service.dart';
 import 'package:provider/provider.dart';

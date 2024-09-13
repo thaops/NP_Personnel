@@ -4,6 +4,10 @@ import 'package:hocflutter/src/Api/provider/api_service.dart';
 import 'package:hocflutter/src/Api/models/project_model.dart';
 import 'package:hocflutter/src/Api/models/task_model.dart';
 import 'package:hocflutter/src/config/constants/color/colors.dart';
+import 'package:hocflutter/src/feature/bottapScreens/home/logic/task_logic.dart';
+import 'package:hocflutter/src/feature/bottapScreens/home/widgets/calendar_widget.dart';
+import 'package:hocflutter/src/feature/bottapScreens/home/widgets/freetime_wiget.dart';
+import 'package:hocflutter/src/feature/bottapScreens/home/widgets/task_list_widget.dart';
 import 'package:hocflutter/src/feature/bottomSheet/task/task_bottomsheet.dart';
 
 import 'package:hocflutter/src/feature/login/login_screen.dart';
@@ -13,6 +17,7 @@ import 'package:hocflutter/styles/gogbal_styles.dart';
 import 'package:hocflutter/widgets/home/custom_switch.dart';
 import 'package:hocflutter/widgets/menu/project_dropdown.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -23,7 +28,14 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  @override
+  void initState() {
+    super.initState();
+    _fetchProject();
+  }
+
   final ApiService _apiService = ApiService();
+  final AuthService _authService = AuthService();
   DateTime today = DateTime.now();
   DateTime? _startDate;
   DateTime? _endDate;
@@ -109,7 +121,6 @@ class _HomeScreenState extends State<HomeScreen> {
     await _fetchTasks();
   }
 
-  final AuthService _authService = AuthService();
 
   Future<void> _signOut(BuildContext context) async {
     final shouldSignOut = await showDialog<bool>(
@@ -146,12 +157,6 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  @override
-  void initState() {
-    super.initState();
-    _fetchProject();
-  }
-
   Future<void> _fetchProject() async {
     try {
       if (widget.accessToken.isNotEmpty) {
@@ -174,12 +179,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> refresh() async {
     await _fetchTasks();
-    // await _fetchProject();
   }
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
       appBar: AppBar(
         title: Text('Home'),
@@ -207,9 +210,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             _isSwitched ? "Cá nhân" : "Mọi Người",
                             style: GogbalStyles.heading3,
                           )),
-                      const SizedBox(
-                        width: 10,
-                      ),
+                      const SizedBox(height: 10),
                       CustomSwitch(
                         value: _isSwitched,
                         onChanged: (value) {
@@ -235,191 +236,22 @@ class _HomeScreenState extends State<HomeScreen> {
                   onRefresh: _refreshProjects,
                 ),
                 const SizedBox(height: 16),
-                _buildTable(),
+                CalendarWidget( startDate: _startDate ?? DateTime.now(),endDate: _endDate ?? DateTime.now(),
+                  onDaySelected: _onDaySelected,
+                ),
                 const SizedBox(height: 20),
                 Divider(),
                 const SizedBox(height: 20),
                 Text(
                   "Tasks on ${_startDate != null ? dateFormatD.format(_startDate!) : 'Unknown Date'} - ${_endDate != null ? dateFormatD.format(_endDate!) : 'Unknown Date'}",
-                  style: const TextStyle(
-                    color: Colors.black,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                  ),
+                  style: GogbalStyles.bodyTextbold
                 ),
-                if (tasks != null && tasks!.isNotEmpty)
-                  ListView.builder(
-                    shrinkWrap: true,
-                    physics: NeverScrollableScrollPhysics(),
-                    itemCount: tasks!.length,
-                    itemBuilder: (context, index) {
-                      final task = tasks![index];
-                      Color titleColor;
-                      switch (task.state) {
-                        case 'In progress':
-                          titleColor = in_progress;
-                          break;
-                        case 'Backlog':
-                          titleColor = backlog;
-                          break;
-                        case 'Done':
-                          titleColor = done;
-                          break;
-                        case 'Pending':
-                          titleColor = pending;
-                          break;
-                        default:
-                          titleColor = Colors.black;
-                      }
-
-                      return GestureDetector(
-                        onTap: () {
-                          showModalBottomSheet(
-                            context: context,
-                            builder: (context) => TaskBottomsheet(
-                              task: task,
-                              onUpdateCallback: _updateTaskList,
-                            ),
-                          );
-                        },
-                        child: Container(
-                          margin: const EdgeInsets.symmetric(vertical: 8),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            border: Border.all(
-                              width: 1.0,
-                              color: Colors.grey.shade400,
-                            ),
-                            borderRadius: BorderRadius.circular(16.0),
-                          ),
-                          child: ListTile(
-                            contentPadding:
-                                const EdgeInsets.symmetric(horizontal: 16),
-                            title: SizedBox(
-                              width: screenWidth * 0.7,
-                              child: Text(
-                                task.title,
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.bold),
-                                overflow: TextOverflow.ellipsis,
-                                maxLines: 1,
-                              ),
-                            ),
-                            trailing: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(
-                                  task.state,
-                                  style: TextStyle(
-                                      color: titleColor,
-                                      fontWeight: FontWeight.bold),
-                                ),
-                                SizedBox(
-                                  width: 10,
-                                ),
-                                const Icon(Icons.arrow_drop_down, size: 24),
-                              ],
-                            ),
-                          ),
-                        ),
-                      );
-                    },
-                  )
-                else
-                  _buidlFreetime(),
-                const SizedBox(
-                  height: 16,
-                ),
+                tasks != null && tasks!.isNotEmpty ? TaskListWidget(updateTaskList: _updateTaskList,tasksList: tasks,) :   FreetimeWiget(),
+                const SizedBox(height: 16,),
               ],
             ),
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildTable() {
-    return Container(
-      color: Colors.white,
-      child: TableCalendar(
-        headerStyle: const HeaderStyle(
-          formatButtonVisible: false,
-          titleCentered: true,
-          headerMargin: EdgeInsets.only(bottom: 16),
-          titleTextStyle: TextStyle(
-            fontSize: 20.0,
-            fontWeight: FontWeight.bold,
-            color: Colors.black87,
-          ),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
-          ),
-        ),
-        availableGestures: AvailableGestures.all,
-        rowHeight: 60,
-        selectedDayPredicate: (day) {
-          return isSameDay(day, _startDate) || isSameDay(day, _endDate);
-        },
-        focusedDay: _focusedDay,
-        firstDay: DateTime.utc(2010, 08, 08),
-        lastDay: DateTime.utc(2025, 12, 12),
-        onDaySelected: _onDaySelected,
-        onPageChanged: (focusedDay) {
-          setState(() {
-            _focusedDay = focusedDay;
-          });
-        },
-        calendarStyle: CalendarStyle(
-          cellMargin: const EdgeInsets.all(6.0),
-          outsideDaysVisible: false,
-          defaultDecoration: BoxDecoration(
-            color: Colors.white,
-            shape: BoxShape.rectangle,
-            borderRadius: BorderRadius.circular(8.0),
-            border: Border.all(color: Colors.grey.shade300, width: 1.0),
-          ),
-          weekendDecoration: BoxDecoration(
-            color: Colors.white,
-            shape: BoxShape.rectangle,
-            borderRadius: BorderRadius.circular(8.0),
-            border: Border.all(color: Colors.grey.shade300, width: 1.0),
-          ),
-          outsideDecoration: BoxDecoration(
-            color: Colors.white,
-            shape: BoxShape.rectangle,
-            borderRadius: BorderRadius.circular(8.0),
-            border: Border.all(color: Colors.grey.shade300, width: 1.0),
-          ),
-          todayDecoration: BoxDecoration(
-            color: Colors.indigo.shade200,
-            shape: BoxShape.rectangle,
-            borderRadius: BorderRadius.circular(8.0),
-            border: Border.all(color: dark_blue, width: 1.0),
-          ),
-          selectedDecoration: BoxDecoration(
-            color: dark_blue,
-            shape: BoxShape.rectangle,
-            borderRadius: BorderRadius.circular(8.0),
-            border: Border.all(color: Colors.blue.shade300, width: 1.0),
-          ),
-          rangeHighlightColor: Colors.blue.shade100.withOpacity(0.5),
-        ),
-      ),
-    );
-  }
-
-  Widget _buidlFreetime() {
-    return Padding(
-      padding: const EdgeInsets.only(top: 0),
-      child: Column(
-        children: [
-          Image.asset(
-            'assets/solutions.png',
-            height: 150,
-            width: 300,
-          ),
-        ],
       ),
     );
   }

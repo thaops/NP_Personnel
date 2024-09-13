@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hocflutter/src/Api/provider/api_service.dart';
 import 'package:hocflutter/src/Api/models/employee_model.dart';
-import 'package:hocflutter/widgets/list_view/list_widgets.dart';
+import 'package:hocflutter/src/feature/bottapScreens/list_off/widget/list_widgets.dart';
 import 'package:provider/provider.dart';
 
 class ListoffScreen extends StatefulWidget {

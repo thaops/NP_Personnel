@@ -28,6 +28,13 @@ class GogbalStyles {
     color: Colors.black,
   );
 
+  // Kiểu chữ nội dung chính
+  static const TextStyle bodyTextbold = TextStyle(
+    fontSize: 16.0,
+    fontWeight: FontWeight.bold,
+    color: Colors.black,
+  );
+
   // Kiểu chữ nội dung phụ
   static const TextStyle bodyText2 = TextStyle(
     fontSize: 16,

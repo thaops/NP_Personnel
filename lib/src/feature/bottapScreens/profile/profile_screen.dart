@@ -1,6 +1,7 @@
 import 'dart:ffi';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
 import 'package:hocflutter/src/Api/provider/api_service.dart';
 import 'package:hocflutter/src/Api/models/profile_model.dart';
 import 'package:hocflutter/src/feature/router/router.dart';
@@ -11,6 +12,7 @@ import 'package:hocflutter/widgets/tasks/text_tasks.dart';
 import 'package:hocflutter/widgets/tasks/wiget_row.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -27,7 +29,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
       'https://e7.pngegg.com/pngimages/799/987/png-clipart-computer-icons-avatar-icon-design-avatar-heroes-computer-wallpaper-thumbnail.png';
   bool _isVision = true;
   int _clickCount = 0;
-  
 
   @override
   void initState() {
@@ -57,13 +58,52 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
+  Future<void> _signOut(BuildContext context) async {
+    final shouldSignOut = await showDialog<bool>(
+      context: context,
+      barrierDismissible:
+          false, // Ngăn người dùng đóng hộp thoại bằng cách nhấn ngoài nó
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Xác nhận đăng xuất'),
+          content: Text('Bạn muốn đăng xuất không?'),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Hủy'),
+              onPressed: () {
+                Navigator.of(context)
+                    .pop(false); // Đóng hộp thoại và trả về false
+              },
+            ),
+            TextButton(
+              child: Text('Đăng xuất'),
+              onPressed: () {
+                Navigator.of(context)
+                    .pop(true); // Đóng hộp thoại và trả về true
+              },
+            ),
+          ],
+        );
+      },
+    );
+
+    if (shouldSignOut == true) {
+      await _authService.signOut();
+      context.go('/login', extra: {'replace': true});
+    }
+  }
+
   Future<void> _onRefresh() async {
     await fetchUsers();
   }
 
+  Future<void> _phoneCall(String phoneNumber) async {
+    launch('tel:$phoneNumber');
+  }
+
   Future<void> _onVision(BuildContext context) async {
-     _clickCount++; 
-    if (_clickCount == 6) {
+    _clickCount++;
+    if (_clickCount == 5) {
       final shouldSignOut = await showDialog<bool>(
         context: context,
         barrierDismissible:
@@ -98,7 +138,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         await _authService.signOut();
         context.go('/login', extra: {'replace': true});
       }
-       _clickCount = 0;
+      _clickCount = 0;
     }
   }
 
@@ -140,11 +180,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 Card(
                   child: Column(
                     children: [
-                      WigetRow(icon: Icons.phone, name: profile?.tel),
+                      WigetRow(
+                        icon: Icons.phone,
+                        name: profile?.tel,
+                        onTap: () {
+                          if (profile?.tel != null) {
+                            _phoneCall(profile!.tel);
+                          }
+                        },
+                      ),
                       WigetRow(icon: Icons.email, name: profile?.email),
                       WigetRow(
                           icon: Icons.location_on_sharp,
                           name: profile?.address),
+                      WigetRow(
+                        icon: Icons.logout,
+                        name: 'Đăng xuất',
+                        onTap: () => _signOut(context),
+                      ),
                     ],
                   ),
                 ),

@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:hocflutter/src/Api/provider/api_service.dart';
+import 'package:hocflutter/src/feature/bottapScreens/home/logic/task_logic.dart';
 import 'package:hocflutter/src/feature/router/router.dart';
 import 'package:hocflutter/src/feature/login/login_screen.dart';
 import 'package:provider/provider.dart';
@@ -18,7 +19,11 @@ void main() async {
   );
   runApp(
     MultiProvider(
-      providers: [ChangeNotifierProvider(create: (_) => ApiService())],
+      providers: [
+        ChangeNotifierProvider(create: (_) => ApiService()),
+        ChangeNotifierProvider(create: (_) =>TaskLogic()),
+        
+        ],
       child: MyApp(),
     ),
   );
