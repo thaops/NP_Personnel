@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hocflutter/Api/models/ProjectRes.dart';
+import 'package:hocflutter/src/Api/models/project_model.dart';
 import 'package:hocflutter/styles/gogbal_styles.dart';
 
 class ProjectDropdown extends StatefulWidget {

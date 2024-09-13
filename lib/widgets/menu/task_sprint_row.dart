@@ -1,7 +1,7 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
 
-import 'package:hocflutter/Api/models/sprint_model.dart';
+import 'package:hocflutter/src/Api/models/sprint_model.dart';
 
 class TaskSprintRow extends StatefulWidget {
   final String label1;
@@ -60,7 +60,7 @@ class _TaskSprintRowState extends State<TaskSprintRow> {
                       EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: Colors.grey.shade300),
+                    borderSide: BorderSide(color: Colors.grey.shade400),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
@@ -68,7 +68,7 @@ class _TaskSprintRowState extends State<TaskSprintRow> {
                   ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: Colors.grey.shade300),
+                    borderSide: BorderSide(color: Colors.grey.shade400),
                   ),
                 ),
                 isExpanded: true,
