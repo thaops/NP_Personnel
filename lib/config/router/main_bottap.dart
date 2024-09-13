@@ -4,7 +4,7 @@ import 'package:hocflutter/config/constants/colors.dart';
 import 'package:hocflutter/screens/bottapScreens/add_screen.dart';
 import 'package:hocflutter/screens/bottapScreens/notifications_screen.dart';
 import 'package:hocflutter/screens/bottapScreens/profile_screen.dart';
-import 'package:hocflutter/screens/bottapScreens/search_screen.dart';
+import 'package:hocflutter/screens/bottapScreens/listoff_screen.dart';
 import 'package:hocflutter/screens/home_screen.dart';
 import 'package:hocflutter/Api/api_service.dart';
 import 'package:provider/provider.dart';
@@ -19,7 +19,7 @@ class _MainScreenState extends State<MainScreen> {
 
   final List<Widget> _screens = [
     HomeScreen(accessToken: ''), // Placeholder for accessToken
-    SearchScreen(),
+    ListoffScreen(),
     AddScreen(),
     NotificationsScreen(),
     ProfileScreen(),
@@ -50,7 +50,7 @@ class _MainScreenState extends State<MainScreen> {
         height: 55,
         items: const [
           TabItem(icon: Icons.home, title: 'Home'),
-          TabItem(icon: Icons.search, title: 'Search'),
+          TabItem(icon: Icons.list, title: 'ListOff'),
           TabItem(icon: Icons.add, title: 'Add'),
           TabItem(icon: Icons.notifications, title: 'Notifi'),
           TabItem(icon: Icons.person, title: 'Profile'),

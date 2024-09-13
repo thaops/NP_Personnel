@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'package:hocflutter/Api/api_service.dart';
 import 'package:hocflutter/Api/models/profileModel.dart';
@@ -24,6 +26,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   String avatar =
       'https://e7.pngegg.com/pngimages/799/987/png-clipart-computer-icons-avatar-icon-design-avatar-heroes-computer-wallpaper-thumbnail.png';
   bool _isVision = true;
+  int _clickCount = 0;
+  
 
   @override
   void initState() {
@@ -37,7 +41,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       final accessToken = apiService.accessTokenId;
 
       if (accessToken.isNotEmpty) {
-        final response = await _apiService.getProfile(accessToken,context);
+        final response = await _apiService.getProfile(accessToken, context);
         if (response != null) {
           setState(() {
             profile = response;
@@ -58,39 +62,43 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<void> _onVision(BuildContext context) async {
-    final shouldSignOut = await showDialog<bool>(
-      context: context,
-      barrierDismissible:
-          false, // Ngăn người dùng đóng hộp thoại bằng cách nhấn ngoài nó
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Xác nhận đổi sang dev'),
-          content: Text('Bạn có muốn đổi sang dev không?'),
-          actions: <Widget>[
-            TextButton(
-              child: Text('Hủy'),
-              onPressed: () {
-                Navigator.of(context)
-                    .pop(false); // Đóng hộp thoại và trả về false
-              },
-            ),
-            TextButton(
-              child: Text('Đồng ý'),
-              onPressed: () {
-                Navigator.of(context)
-                    .pop(true); // Đóng hộp thoại và trả về true
-              },
-            ),
-          ],
-        );
-      },
-    );
+     _clickCount++; 
+    if (_clickCount == 6) {
+      final shouldSignOut = await showDialog<bool>(
+        context: context,
+        barrierDismissible:
+            false, // Ngăn người dùng đóng hộp thoại bằng cách nhấn ngoài nó
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Xác nhận đổi sang dev'),
+            content: Text('Bạn có muốn đổi sang dev không?'),
+            actions: <Widget>[
+              TextButton(
+                child: Text('Hủy'),
+                onPressed: () {
+                  Navigator.of(context)
+                      .pop(false); // Đóng hộp thoại và trả về false
+                },
+              ),
+              TextButton(
+                child: Text('Đồng ý'),
+                onPressed: () {
+                  Navigator.of(context)
+                      .pop(true); // Đóng hộp thoại và trả về true
+                },
+              ),
+            ],
+          );
+        },
+      );
 
-    if (shouldSignOut == true) {
-      final apiService = Provider.of<ApiService>(context, listen: false);
-      apiService.setIsVision(!apiService.isVision);
-      await _authService.signOut();
-      context.go('/login', extra: {'replace': true});
+      if (shouldSignOut == true) {
+        final apiService = Provider.of<ApiService>(context, listen: false);
+        apiService.setIsVision(!apiService.isVision);
+        await _authService.signOut();
+        context.go('/login', extra: {'replace': true});
+      }
+       _clickCount = 0;
     }
   }
 
@@ -142,7 +150,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
               ],
             ),
-            SizedBox(height: 16,),
+            SizedBox(
+              height: 16,
+            ),
             GestureDetector(
                 onTap: () {
                   _onVision(context);

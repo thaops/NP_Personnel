@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hocflutter/config/constants/colors.dart';
 
 class TaskStatusPriorityRow extends StatelessWidget {
   final String label1;
@@ -35,6 +36,19 @@ class TaskStatusPriorityRow extends StatelessWidget {
     BuildContext context,
     Function(String) onSelection,
   ) {
+    Color titleColor;
+    // Determine color based on the label and value
+    switch (label) {
+      case 'Độ ưu tiên':
+        titleColor = _getPriorityColor(value);
+        break;
+      case 'Trạng Thái':
+        titleColor = _getStatusColor(value);
+        break;
+      default:
+        titleColor = Colors.black;
+    }
+
     return Expanded(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -72,9 +86,7 @@ class TaskStatusPriorityRow extends StatelessWidget {
                       value,
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         fontWeight: FontWeight.w500,
-                        color: label == "Trạng Thái"
-                            ? Colors.green
-                            : Theme.of(context).colorScheme.secondary,
+                        color: titleColor,
                       ),
                     ),
                     Icon(Icons.arrow_drop_down,
@@ -87,6 +99,34 @@ class TaskStatusPriorityRow extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  Color _getPriorityColor(String value) {
+    switch (value) {
+      case 'high':
+        return high; // Define these colors in your constants
+      case 'medium':
+        return medium;
+      case 'low':
+        return low;
+      default:
+        return Colors.black;
+    }
+  }
+
+  Color _getStatusColor(String value) {
+    switch (value) {
+      case 'in-progress':
+        return in_progress; // Define these colors in your constants
+      case 'backlog':
+        return backlog;
+      case 'done':
+        return done;
+      case 'pending':
+        return pending;
+      default:
+        return Colors.black;
+    }
   }
 
   List<PopupMenuEntry<String>> _getMenuItems(String label) {

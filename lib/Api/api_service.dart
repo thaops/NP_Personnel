@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:hocflutter/Api/models/ApiResponse.dart';
+import 'package:hocflutter/Api/models/apiResponse.dart';
 import 'package:hocflutter/Api/models/ProjectRes.dart';
-import 'package:hocflutter/Api/models/Users.dart';
+import 'package:hocflutter/Api/models/employee.dart';
+import 'package:hocflutter/Api/models/users.dart';
 import 'package:hocflutter/Api/models/profileModel.dart';
 import 'package:hocflutter/Api/models/sprint_model.dart';
 import 'package:hocflutter/Api/models/task.dart';
@@ -311,11 +312,38 @@ class ApiService extends ChangeNotifier {
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> jsonResponse = json.decode(response.body);
-        print('JSON Response: $jsonResponse');
         final Map<String, dynamic> taskJson = jsonResponse['data'];
         return Profile.fromJson(taskJson);
       } else {
         print('Failed to load task');
+        return null;
+      }
+    } catch (e) {
+      print('Error: $e');
+      return null;
+    }
+  }
+
+  Future<List<Employee>?> getListOff(String accessToken,DateTime firstDayOfMonth,DateTime lastDayOfMonth, context) async {
+    final String url =
+        '${getBaseUrl(context)}/dayoff/list-day-off?pageIndex=1&pageSize=9999&fromDate=$firstDayOfMonth&toDate=$lastDayOfMonth&keyword=';
+    try {
+      final response = await http.get(
+        Uri.parse(url),
+        headers: {
+          'Authorization': 'Bearer $accessToken',
+          'Content-Type': 'application/json',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> jsonResponse = json.decode(response.body);
+        final List<dynamic> employeeJson = jsonResponse['data'];
+        List<Employee> employee = employeeJson
+            .map((employeeJson) => Employee.fromJson(employeeJson))
+            .toList();
+        return employee;
+      } else {
         return null;
       }
     } catch (e) {

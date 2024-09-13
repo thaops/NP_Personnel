@@ -8,7 +8,7 @@ class BaseUrlProvider {
     final bool isVision = apiService.isVision;
 
     final String baseUrlDev = 'https://napro-api.azurewebsites.net/api';
-    final String baseUrlNp = 'https://coxe-api.azurewebsites.net/api';
+    final String baseUrlNp = 'https://napro-api.azurewebsites.net/api';
 
     return isVision ? baseUrlNp : baseUrlDev;
   }

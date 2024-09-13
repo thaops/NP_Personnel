@@ -4,7 +4,7 @@ import 'package:hocflutter/config/router/main_bottap.dart';
 import 'package:hocflutter/screens/bottapScreens/add_screen.dart';
 import 'package:hocflutter/screens/bottapScreens/notifications_screen.dart';
 import 'package:hocflutter/screens/bottapScreens/profile_screen.dart';
-import 'package:hocflutter/screens/bottapScreens/search_screen.dart';
+import 'package:hocflutter/screens/bottapScreens/listoff_screen.dart';
 import 'package:hocflutter/screens/home_screen.dart';
 import 'package:hocflutter/screens/login_screen.dart';
 import 'package:hocflutter/screens/task_detail_screen.dart';

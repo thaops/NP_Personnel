@@ -1,6 +1,7 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hocflutter/config/constants/colors.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
@@ -38,7 +39,8 @@ class _TaskBottomsheetState extends State<TaskBottomsheet> {
 
     print("taskId: $taskId");
 
-    final Task? fetchedTask = await apiService.getTask(taskId, accessToken,context);
+    final Task? fetchedTask =
+        await apiService.getTask(taskId, accessToken, context);
 
     if (fetchedTask != null) {
       setState(() {
@@ -88,7 +90,8 @@ class _TaskBottomsheetState extends State<TaskBottomsheet> {
     );
 
     if (confirmDelete == true) {
-      final bool success = await apiService.deleteTask(taskId, accessToken,context);
+      final bool success =
+          await apiService.deleteTask(taskId, accessToken, context);
 
       if (success) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -108,6 +111,7 @@ class _TaskBottomsheetState extends State<TaskBottomsheet> {
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final DateFormat dateFormatD = DateFormat('HH:mm yyyy-MM-dd');
+
 
     return Container(
       width: screenWidth,
@@ -160,7 +164,7 @@ class _TaskBottomsheetState extends State<TaskBottomsheet> {
                     SizedBox(height: 20),
                     TextTasks(
                       text1: 'Nhân viên',
-                      text2: _fetchedTask?.creator ?? widget.task.creator,
+                      text2: _fetchedTask?.assignee ?? widget.task.assignee,
                     ),
                     SizedBox(height: 20),
                     Container(
@@ -202,8 +206,9 @@ class _TaskBottomsheetState extends State<TaskBottomsheet> {
                           Expanded(
                             child: TextTasks(
                               text1: 'Ngày bắt đầu',
-                              text2: dateFormatD.format(_fetchedTask?.startDate ??
-                                  widget.task.startDate),
+                              text2: dateFormatD.format(
+                                  _fetchedTask?.startDate ??
+                                      widget.task.startDate),
                             ),
                           ),
                           SizedBox(width: 20),
@@ -213,7 +218,8 @@ class _TaskBottomsheetState extends State<TaskBottomsheet> {
                               child: TextTasks(
                                 text1: 'Ngày kết thúc',
                                 text2: dateFormatD.format(
-                                    _fetchedTask?.dueDate ?? widget.task.dueDate),
+                                    _fetchedTask?.dueDate ??
+                                        widget.task.dueDate),
                               ),
                             ),
                           ),

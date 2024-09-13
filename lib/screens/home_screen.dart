@@ -54,8 +54,8 @@ class _HomeScreenState extends State<HomeScreen> {
           _startDate != null &&
           _endDate != null) {
         project ??= '';
-        tasks = await _apiService.fetchTasks(
-            widget.accessToken, _startDate!, _endDate!, project!, _isSwitched,context);
+        tasks = await _apiService.fetchTasks(widget.accessToken, _startDate!,
+            _endDate!, project!, _isSwitched, context);
         setState(() {});
       } else {
         print('Access token, start date, or end date is missing.');
@@ -155,7 +155,8 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> _fetchProject() async {
     try {
       if (widget.accessToken.isNotEmpty) {
-        final response = await _apiService.getProject(widget.accessToken,context);
+        final response =
+            await _apiService.getProject(widget.accessToken, context);
         if (response != null) {
           setState(() {
             projectList = response;
@@ -173,7 +174,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> refresh() async {
     await _fetchTasks();
-    await _fetchProject();
+    // await _fetchProject();
   }
 
   @override
@@ -191,9 +192,8 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       body: RefreshIndicator(
         onRefresh: refresh,
-       
         child: SingleChildScrollView(
-           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           child: Center(
             child: Column(
               children: [
@@ -254,6 +254,24 @@ class _HomeScreenState extends State<HomeScreen> {
                     itemCount: tasks!.length,
                     itemBuilder: (context, index) {
                       final task = tasks![index];
+                      Color titleColor;
+                      switch (task.state) {
+                        case 'In progress':
+                          titleColor = in_progress;
+                          break;
+                        case 'Backlog':
+                          titleColor = backlog;
+                          break;
+                        case 'Done':
+                          titleColor = done;
+                          break;
+                        case 'Pending':
+                          titleColor = pending;
+                          break;
+                        default:
+                          titleColor = Colors.black;
+                      }
+
                       return GestureDetector(
                         onTap: () {
                           showModalBottomSheet(
@@ -292,10 +310,12 @@ class _HomeScreenState extends State<HomeScreen> {
                               children: [
                                 Text(
                                   task.state,
-                                  style: const TextStyle(
-                                      color: Colors.green,
+                                  style: TextStyle(
+                                      color: titleColor,
                                       fontWeight: FontWeight.bold),
+                                      
                                 ),
+                                SizedBox(width: 10,),
                                 const Icon(Icons.arrow_drop_down, size: 24),
                               ],
                             ),

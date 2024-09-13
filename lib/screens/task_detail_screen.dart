@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:hocflutter/Api/api_service.dart';
-import 'package:hocflutter/Api/models/Users.dart';
+import 'package:hocflutter/Api/models/users.dart';
 import 'package:hocflutter/Api/models/sprint_model.dart';
 import 'package:hocflutter/Api/models/task.dart';
 import 'package:hocflutter/config/constants/colors.dart';

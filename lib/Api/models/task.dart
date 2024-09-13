@@ -13,6 +13,7 @@ class Task {
   final String sprintId;
   final String sprintTitle;
   final String creatorId;
+  final String assignee;  // Assignee added here
 
   Task({
     required this.id,
@@ -28,7 +29,8 @@ class Task {
     required this.projectId,
     required this.sprintId,
     required this.sprintTitle,
-    required this.creatorId, 
+    required this.creatorId,
+    required this.assignee,  // Added in constructor
   });
 
   factory Task.fromJson(Map<String, dynamic> json) {
@@ -50,12 +52,13 @@ class Task {
       projectId: json['projectId'] ?? '',
       sprintId: json['sprintId'] ?? '',
       sprintTitle: json['sprintTitle'] ?? '',
-      creatorId: json['creatorId'] ?? '', 
+      creatorId: json['creatorId'] ?? '',
+      assignee: json['assignee'] ?? '',  // Added in fromJson
     );
   }
 
   @override
   String toString() {
-    return 'Task{id: $id, title: $title, description: $description, state: $state, priority: $priority, creator: $creator, note: $note, project: $project, startDate: $startDate, dueDate: $dueDate, projectId: $projectId, sprintId: $sprintId, sprintTitle: $sprintTitle, creatorId: $creatorId}';
+    return 'Task{id: $id, title: $title, description: $description, state: $state, priority: $priority, creator: $creator, note: $note, project: $project, startDate: $startDate, dueDate: $dueDate, projectId: $projectId, sprintId: $sprintId, sprintTitle: $sprintTitle, creatorId: $creatorId, assignee: $assignee}';
   }
 }
