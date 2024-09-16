@@ -8,6 +8,8 @@ import 'package:hocflutter/src/Api/models/sprint_model.dart';
 import 'package:hocflutter/src/Api/models/task_model.dart';
 import 'package:hocflutter/src/Api/models/task_response_model.dart';
 import 'package:hocflutter/src/config/constants/url/url.dart';
+import 'package:hocflutter/src/feature/bottapScreens/list_off/models/add.leave.dart';
+import 'package:hocflutter/src/feature/bottapScreens/list_off/models/leave.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
@@ -350,5 +352,71 @@ class ApiService extends ChangeNotifier {
       print('Error: $e');
       return null;
     }
+  }
+
+Future<List<LeaveType>?> getLeave(String accessToken,BuildContext context) async {
+    final String url =
+        '${getBaseUrl(context)}/dayoff/list-category?pageIndex=1&pageSize=9999';
+    try {
+      final response = await http.get(
+        Uri.parse(url),
+        headers: {
+          'Authorization': 'Bearer $accessToken',
+          'Content-Type': 'application/json',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> jsonResponse = json.decode(response.body);
+        final List<dynamic> leaveJson = jsonResponse['data'];
+        List<LeaveType> leaves = leaveJson
+            .map((leaveJson) => LeaveType.fromJson(leaveJson))
+            .toList();
+        return leaves;
+      } else {
+        return null;
+      }
+    } catch (e) {
+      print('Error: $e');
+      return null;
+    }
+  }
+
+
+ Future<ResponseModel> addLeave(
+      String accessToken, Map<String, dynamic> addData,BuildContext context) async {
+    final String url = '${getBaseUrl(context)}/dayoff/add-day-off';
+try {
+  final response = await http.post(
+    Uri.parse(url),
+    headers: {
+      'Authorization': 'Bearer $accessToken',
+      'Content-Type': 'application/json',
+    },
+    body: jsonEncode(addData),
+  );
+  print('Response status: ${response.statusCode}');
+  print('Response body: ${response.body}'); // Debugging line
+
+  if (response.statusCode == 200) {
+    final Map<String, dynamic> data = jsonDecode(response.body);
+    return ResponseModel.fromJson(data);
+  } else {
+    return ResponseModel(
+      statusCode: response.statusCode,
+      message: 'Request failed with status: ${response.statusCode}',
+      totalRecord: 0,
+      data: true,
+    );
+  }
+} catch (e) {
+  return ResponseModel(
+    statusCode: 500,
+    message: 'An error occurred: $e',
+    totalRecord: 0,
+    data: true,
+  );
+}
+
   }
 }

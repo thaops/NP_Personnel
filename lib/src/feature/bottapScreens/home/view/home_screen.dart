@@ -5,9 +5,11 @@ import 'package:hocflutter/src/Api/models/project_model.dart';
 import 'package:hocflutter/src/Api/models/task_model.dart';
 import 'package:hocflutter/src/config/constants/color/colors.dart';
 import 'package:hocflutter/src/feature/bottapScreens/home/logic/task_logic.dart';
-import 'package:hocflutter/src/feature/bottapScreens/home/widgets/calendar_widget.dart';
-import 'package:hocflutter/src/feature/bottapScreens/home/widgets/freetime_wiget.dart';
-import 'package:hocflutter/src/feature/bottapScreens/home/widgets/task_list_widget.dart';
+import 'package:hocflutter/src/feature/bottapScreens/home/widgets/home_calendar_widget.dart';
+import 'package:hocflutter/src/feature/bottapScreens/home/widgets/home_freetime_wiget.dart';
+import 'package:hocflutter/src/feature/bottapScreens/home/widgets/home_menu_widget.dart';
+import 'package:hocflutter/src/feature/bottapScreens/home/widgets/home_task_list_widget.dart';
+
 import 'package:hocflutter/src/feature/bottomSheet/task/task_bottomsheet.dart';
 
 import 'package:hocflutter/src/feature/login/login_screen.dart';
@@ -32,6 +34,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     _fetchProject();
+
   }
 
   final ApiService _apiService = ApiService();
@@ -50,6 +53,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   final DateFormat dateFormat = DateFormat('dd-MM-yyyy HH:mm:ss.SSS');
   final DateFormat dateFormatD = DateFormat('dd-MM-yyyy');
+
   void _checkAndFetchTasks() {
     if (_startDate != null && _endDate != null) {
       _fetchTasks();
@@ -66,7 +70,7 @@ class _HomeScreenState extends State<HomeScreen> {
           _startDate != null &&
           _endDate != null) {
         project ??= '';
-        tasks = await _apiService.fetchTasks(widget.accessToken, _startDate!,
+          tasks = await _apiService.fetchTasks(widget.accessToken, _startDate!,
             _endDate!, project!, _isSwitched, context);
         setState(() {});
       } else {
@@ -120,7 +124,6 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> _refreshProjects() async {
     await _fetchTasks();
   }
-
 
   Future<void> _signOut(BuildContext context) async {
     final shouldSignOut = await showDialog<bool>(
@@ -184,6 +187,9 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      drawer: Drawer(
+        child: MenuWidget(),
+      ),
       appBar: AppBar(
         title: Text('Home'),
         actions: [
@@ -236,18 +242,26 @@ class _HomeScreenState extends State<HomeScreen> {
                   onRefresh: _refreshProjects,
                 ),
                 const SizedBox(height: 16),
-                CalendarWidget( startDate: _startDate ?? DateTime.now(),endDate: _endDate ?? DateTime.now(),
+                HomeCalendarWidget(
+                  startDate: _startDate ?? DateTime.now(),
+                  endDate: _endDate ?? DateTime.now(),
                   onDaySelected: _onDaySelected,
                 ),
                 const SizedBox(height: 20),
                 Divider(),
                 const SizedBox(height: 20),
                 Text(
-                  "Tasks on ${_startDate != null ? dateFormatD.format(_startDate!) : 'Unknown Date'} - ${_endDate != null ? dateFormatD.format(_endDate!) : 'Unknown Date'}",
-                  style: GogbalStyles.bodyTextbold
+                    "Tasks on ${_startDate != null ? dateFormatD.format(_startDate!) : 'Unknown Date'} - ${_endDate != null ? dateFormatD.format(_endDate!) : 'Unknown Date'}",
+                    style: GogbalStyles.bodyTextbold),
+                tasks != null && tasks!.isNotEmpty
+                    ? HomeTaskListWidget(
+                        updateTaskList: _updateTaskList,
+                        tasksList: tasks,
+                      )
+                    : HomeFreetimeWiget(),
+                const SizedBox(
+                  height: 16,
                 ),
-                tasks != null && tasks!.isNotEmpty ? TaskListWidget(updateTaskList: _updateTaskList,tasksList: tasks,) :   FreetimeWiget(),
-                const SizedBox(height: 16,),
               ],
             ),
           ),

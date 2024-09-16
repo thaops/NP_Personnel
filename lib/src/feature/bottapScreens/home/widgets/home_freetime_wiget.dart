@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class FreetimeWiget extends StatelessWidget {
-  const FreetimeWiget({super.key});
+class HomeFreetimeWiget extends StatelessWidget {
+  const HomeFreetimeWiget({super.key});
 
   @override
   Widget build(BuildContext context) {

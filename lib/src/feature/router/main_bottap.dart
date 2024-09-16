@@ -19,7 +19,7 @@ class _MainScreenState extends State<MainScreen> {
 
   final List<Widget> _screens = [
     HomeScreen(accessToken: ''), // Placeholder for accessToken
-    ListoffScreen(),
+    ListoffScreen(onUpdateCallback: (bool ) {  },),
     AddScreen(),
     NotificationsScreen(),
     ProfileScreen(),

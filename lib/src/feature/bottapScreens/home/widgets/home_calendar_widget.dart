@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:hocflutter/src/config/constants/color/colors.dart';
 import 'package:table_calendar/table_calendar.dart';
 
-class CalendarWidget extends StatefulWidget {
+class HomeCalendarWidget extends StatefulWidget {
   final DateTime? startDate;
   final DateTime? endDate;
   final Function(DateTime, DateTime) onDaySelected;
 
-  const CalendarWidget({
+  const HomeCalendarWidget({
     Key? key,
     required this.startDate,
     required this.endDate,
@@ -15,10 +15,10 @@ class CalendarWidget extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<CalendarWidget> createState() => _CalendarWidgetState();
+  State<HomeCalendarWidget> createState() => _HomeCalendarWidgetState();
 }
 
-class _CalendarWidgetState extends State<CalendarWidget> {
+class _HomeCalendarWidgetState extends State<HomeCalendarWidget> {
   late DateTime _focusedDay;
   
   @override
@@ -91,6 +91,7 @@ class _CalendarWidgetState extends State<CalendarWidget> {
           ),
           rangeHighlightColor: Colors.blue.shade100.withOpacity(0.5),
         ),
+        locale: 'vi_VN',
       ),
     );
   }

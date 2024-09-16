@@ -198,7 +198,7 @@ class _AddScreenState extends State<AddScreen> {
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Tạo Task Thất bại: ${response.message}')),
+        SnackBar(content: Text('Tạo Task Thất bại')),
       );
     }
   }
@@ -323,7 +323,7 @@ class _AddScreenState extends State<AddScreen> {
               ),
               const SizedBox(height: 16),
               TaskNoteSection(
-                label: 'Note:',
+                label: 'Ghi chú:',
                 note: '',
                 screenWidth: screenWidth,
                 controllerNote: _controllerNote,

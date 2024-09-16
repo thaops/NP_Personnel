@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hocflutter/src/feature/bottapScreens/list_off/view/listoff_add_screen.dart';
+import 'package:hocflutter/src/feature/bottapScreens/list_off/view/listoff_screen.dart';
 import 'package:hocflutter/src/feature/router/main_bottap.dart';
 
 
@@ -18,6 +20,10 @@ class AppRouter {
         GoRoute(
         path: '/main',
         builder: (context, state) => MainScreen(),
+      ),
+              GoRoute(
+        path: '/listoffadd',
+        builder: (context, state) => ListoffAddScreen(),
       ),
 
       GoRoute(

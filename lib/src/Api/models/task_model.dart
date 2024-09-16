@@ -53,7 +53,7 @@ class Task {
       sprintId: json['sprintId'] ?? '',
       sprintTitle: json['sprintTitle'] ?? '',
       creatorId: json['creatorId'] ?? '',
-      assignee: json['assignee'] ?? '',  // Added in fromJson
+      assignee: json['assignee'] ?? '', 
     );
   }
 

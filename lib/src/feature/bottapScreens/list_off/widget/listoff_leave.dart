@@ -2,27 +2,28 @@
 import 'package:flutter/material.dart';
 
 import 'package:hocflutter/src/Api/models/users_model.dart';
+import 'package:hocflutter/src/feature/bottapScreens/list_off/models/leave.dart';
 
-class TaskInfoRow extends StatefulWidget {
+class ListoffLeave extends StatefulWidget {
   final String label1;
   final String? name;
-  final List<UserModel>? usersList;
-  final void Function(UserModel?)? onProjectSelected;
+  final List<LeaveType>? leaveList;
+  final void Function(LeaveType?)? onProjectSelected;
 
-  TaskInfoRow({
+  ListoffLeave({
     Key? key,
     required this.label1,
     this.name,
-    this.usersList,
+    this.leaveList,
     this.onProjectSelected,
   }) : super(key: key);
 
   @override
-  State<TaskInfoRow> createState() => _TaskInfoRowState();
+  State<ListoffLeave> createState() => _ListoffLeaveState();
 }
 
-class _TaskInfoRowState extends State<TaskInfoRow> {
-  UserModel? _selectedUser;
+class _ListoffLeaveState extends State<ListoffLeave> {
+  LeaveType? _selectedUser;
 
   @override
   Widget build(BuildContext context) {
@@ -46,7 +47,7 @@ class _TaskInfoRowState extends State<TaskInfoRow> {
             width: screenWidth,
             decoration: BoxDecoration(
                 color: Colors.white, borderRadius: BorderRadius.circular(12)),
-            child: DropdownButtonFormField<UserModel>(
+            child: DropdownButtonFormField<LeaveType>(
               decoration: InputDecoration(
                 contentPadding:
                     EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -66,8 +67,8 @@ class _TaskInfoRowState extends State<TaskInfoRow> {
               ),
               isExpanded: true,
               value: _selectedUser,
-              hint: Text(widget.name ?? 'họ và tên ?'),
-              onChanged: (UserModel? newValue) {
+              hint: Text(widget.name ?? 'lý do?'),
+              onChanged: (LeaveType? newValue) {
                 setState(() {
                   _selectedUser = newValue;
                   if (widget.onProjectSelected != null) {
@@ -75,11 +76,11 @@ class _TaskInfoRowState extends State<TaskInfoRow> {
                   }
                 });
               },
-              items: widget.usersList?.map((UserModel user) {
-                    return DropdownMenuItem<UserModel>(
+              items: widget.leaveList?.map((LeaveType user) {
+                    return DropdownMenuItem<LeaveType>(
                       value: user,
                       child: Text(
-                        user.fullName,
+                        user.name,
                         style: TextStyle(color: Colors.black87),
                       ),
                     );
