@@ -144,6 +144,14 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
     final accessToken = apiService.accessTokenId;
     final taskId = widget.task.id;
 
+    if (_dueDate.isBefore(_startDate)) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Ngày kết thúc không được nhỏ hơn ngày bắt đầu.'),
+      ),
+    );
+    return; 
+  }
     Map<String, dynamic> updateData = {
       'title': _controller.text,
       'note': _controllerNote.text,

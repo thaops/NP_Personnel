@@ -36,8 +36,31 @@ class _ListoffAddScreenState extends State<ListoffAddScreen> {
   }
 
   void _save() async {
+    if (leaveID == null || usersID == null || _controllerNote.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Vui lòng điền đầy đủ thông tin')),
+      );
+      return;
+    }
     final apiService = Provider.of<ApiService>(context, listen: false);
     final accessToken = apiService.accessTokenId;
+
+    if (accessToken == null || accessToken.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Access token không hợp lệ')),
+      );
+      return;
+    }
+
+    if (_dueDate.isBefore(_startDate)) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Ngày kết thúc không được nhỏ hơn ngày bắt đầu.'),
+      ),
+    );
+    return; 
+  }
+
     Map<String, dynamic> addData = {
       'reason': _controllerNote.text,
       'fromDate': _startDate.toIso8601String(),

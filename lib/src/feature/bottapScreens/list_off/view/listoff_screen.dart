@@ -70,9 +70,10 @@ class _ListoffScreenState extends State<ListoffScreen> {
     _fetchListOff(months[0]['firstDay']!, months[0]['lastDay']!);
   }
 
-void _addScreen() {
-  GoRouter.of(context).push('/listoffadd', extra: _fetchListOff)
-    .then((value) {
+  void _addScreen() {
+    GoRouter.of(context)
+        .push('/listoffadd', extra: _fetchListOff)
+        .then((value) {
       if (value == true) {
         print('Adding screen returned true, updating list...');
         widget.onUpdateCallback(true);
@@ -81,11 +82,16 @@ void _addScreen() {
         print('Adding screen did not return true.');
       }
     });
-}
+  }
 
   Future<void> refresh() async {
-    await  _fetchListOff(months[0]['firstDay']!, months[0]['lastDay']!);;
+    await _fetchListOff(months[0]['firstDay']!, months[0]['lastDay']!);
+    ;
+    setState(() {
+      selectedMonth = null;
+    });
   }
+
   @override
   Widget build(BuildContext context) {
     return RefreshIndicator(
@@ -112,8 +118,10 @@ void _addScreen() {
           padding: const EdgeInsets.all(0.0),
           child: Column(
             children: [
-              ListoffAddWidget(onAdd: _addScreen,),
-              // Lịch mini để chọn thán
+              ListoffAddWidget(
+                onAdd: _addScreen,
+              ),
+
               MonthSelector(
                 months: months,
                 selectedMonth: selectedMonth,

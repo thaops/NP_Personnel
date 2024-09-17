@@ -86,6 +86,17 @@ class LoginScreen extends StatelessWidget {
             SizedBox(height: 20),
             GoogleSignInButton(
               onPressed: () async {
+                // Hiển thị hộp thoại loading
+                showDialog(
+                  context: context,
+                  barrierDismissible: false,
+                  builder: (BuildContext context) {
+                    return Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  },
+                );
+
                 try {
                   User? user = await _authService.signInWithGoogle();
                   if (user != null) {
@@ -95,29 +106,35 @@ class LoginScreen extends StatelessWidget {
                         await googleUser!.authentication;
                     String? accessToken = googleAuth.accessToken;
                     if (accessToken != null) {
-                      var response =
-                          await _apiService.sendTokenToApi(accessToken,context);
+                      var response = await _apiService.sendTokenToApi(
+                          accessToken, context);
                       var accessTokenId = response.accessToken.toString();
                       if (response.statusCode == 200) {
-                          Provider.of<ApiService>(context, listen: false)
+                        Provider.of<ApiService>(context, listen: false)
                             .setAccessTokenId(accessTokenId);
+                        // Ẩn loading khi đăng nhập thành công
+                        Navigator.pop(context);
                         context.go('/main');
                       } else {
+                        Navigator.pop(context); // Ẩn loading
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(content: Text('Xác thực thất bại')),
                         );
                       }
                     } else {
+                      Navigator.pop(context); // Ẩn loading
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(content: Text('Không thể lấy access token')),
                       );
                     }
                   } else {
+                    Navigator.pop(context); // Ẩn loading
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(content: Text('Đăng nhập thất bại')),
                     );
                   }
                 } catch (e) {
+                  Navigator.pop(context); // Ẩn loading nếu có lỗi
                   print('Lỗi: $e');
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text('Có lỗi xảy ra')),

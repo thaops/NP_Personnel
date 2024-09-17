@@ -110,7 +110,7 @@ class _TaskBottomsheetState extends State<TaskBottomsheet> {
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
-    final DateFormat dateFormatD = DateFormat('HH:mm yyyy-MM-dd');
+    final DateFormat dateFormatD = DateFormat('dd-MM-yyyy HH:mm');
 
 
     return Container(

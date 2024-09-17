@@ -176,6 +176,16 @@ class _AddScreenState extends State<AddScreen> {
     final apiService = Provider.of<ApiService>(context, listen: false);
     final accessToken = apiService.accessTokenId;
 
+
+    if (_dueDate.isBefore(_startDate)) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Ngày kết thúc không được nhỏ hơn ngày bắt đầu.'),
+      ),
+    );
+    return; 
+  }
+
     Map<String, dynamic> addData = {
       'title': _controller.text,
       'note': _controllerNote.text,
@@ -183,8 +193,8 @@ class _AddScreenState extends State<AddScreen> {
       'dueDate': _dueDate.toIso8601String(),
       'state': _status,
       'priority': _priority,
-      'projectId': project ?? '09764aab-bfe7-4602-b416-0a9057ceda5d',
-      'sprintId': sprintID ?? 'd142acbc-bbe0-4963-82de-1d4f13319953',
+      'projectId': project ,
+      'sprintId': sprintID ,
       'parentTaskId': null,
       'assigneeId': usersID ?? profile?.id,
       "wbs": _isWbs
